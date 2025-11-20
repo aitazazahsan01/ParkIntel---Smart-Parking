@@ -1,152 +1,146 @@
-import Link from 'next/link'
-import { Car, BarChart2, BrainCircuit, Zap, DollarSign } from 'lucide-react'
-
-// Re-usable button classes for consistency
-const buttonClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none h-11 px-8 py-3"
+import Link from "next/link";
+import { ArrowRight, Zap, MapPin, TrendingUp, Activity, ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function WelcomePage() {
   return (
-    // overflow-hidden prevents animation/glow artifacts from showing a scrollbar
-    <main className="flex flex-col items-center overflow-hidden">
-
-      {/* Hero Section */}
-      <section className="relative w-full border-b dark:border-slate-800">
-        <div className="container relative z-10 mx-auto flex max-w-5xl flex-col items-center justify-center gap-6 pb-24 pt-16 text-center lg:pb-32 lg:pt-24">
+    <main className="relative flex min-h-screen flex-col overflow-hidden bg-slate-950 selection:bg-indigo-500/30">
+      
+      {/* --- Top Navigation (Added for Operator Access) --- */}
+      <nav className="relative z-50 flex w-full items-center justify-between px-6 py-6 md:px-10">
+        <div className="flex items-center gap-2 font-bold text-white">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
+            <span className="text-lg">P</span>
+          </div>
+          ParkIntel
+        </div>
+        
+        <div className="flex items-center gap-4">
+          {/* OPERATOR LOGIN BUTTON - Distinct and accessible */}
+          <Button variant="ghost" className="text-slate-400 hover:text-white hover:bg-slate-800" asChild>
+            <Link href="/operator/login">
+              <ShieldCheck className="mr-2 h-4 w-4" />
+              Staff Portal
+            </Link>
+          </Button>
           
-          {/* Hero Glow Effect */}
-          <div className="absolute -top-1/4 left-1/2 -z-10 h-96 w-96 -translate-x-1/2 bg-gradient-to-r from-indigo-500/30 to-purple-500/30 opacity-20 filter blur-3xl dark:opacity-40" />
+                  </div>
+      </nav>
 
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-            Parking, Perfected.
-            <span className="block bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
-              Powered by AI.
+      {/* --- Background Glow --- */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-indigo-600/20 blur-[120px] opacity-50" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-600/10 blur-[100px]" />
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
+      </div>
+
+      <div className="relative z-10 container mx-auto px-4 py-10 flex flex-col items-center">
+        
+        {/* 1. HERO SECTION */}
+        <div className="text-center max-w-4xl mb-16 space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-xs font-medium uppercase tracking-wider">
+            <Activity size={12} /> System Operational • Lahore & Islamabad
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-2xl">
+            The Future of <br className="hidden md:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400">
+              Urban Mobility.
             </span>
           </h1>
-          <p className="max-w-2xl text-lg text-muted-foreground sm:text-xl">
-            Stop circling the block. ParkIntel uses real-time data and AI to
-            predict parking availability, so you can find a spot, save fuel,
-            and get on with your day.
+          
+          <p className="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            ParkIntel leverages deep learning to forecast parking demand 24 hours in advance. 
+            We connect high-intent drivers with secure, optimized spaces.
           </p>
-
-          <Link
-            href="/map"
-            className={`${buttonClasses} bg-primary text-primary-foreground hover:bg-primary/90 text-base font-bold shadow-lg`}
-          >
-            Find Parking Now
-          </Link>
         </div>
-        
-        {/* Subtle Grid Background */}
-        <div className="absolute inset-0 -z-20 h-full w-full bg-white dark:bg-slate-950">
-          <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,rgba(240,240,240,0.8)_1px,transparent_1px),linear-gradient(to_bottom,rgba(240,240,240,0.8)_1px,transparent_1px)] bg-[size:36px_36px] opacity-20 dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.1)_1px,transparent_1px)]"></div>
-        </div>
-      </section>
 
-      {/* Features Section */}
-      <section className="w-full border-b bg-background/50 py-16 dark:border-slate-800 md:py-24">
-        <div className="container mx-auto max-w-5xl">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              How It Works
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Our platform analyzes thousands of data points to deliver a seamless parking experience.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {/* Feature 1 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50">
-                <BrainCircuit className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+        {/* 2. USER PATHS (Bento Grid) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl mb-24">
+          
+          {/* DRIVER CARD */}
+          <div className="group relative overflow-hidden rounded-3xl bg-slate-900/50 border border-slate-800 p-8 hover:border-indigo-500/50 transition-all duration-500 hover:shadow-[0_0_30px_-5px_rgba(99,102,241,0.2)]">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 text-indigo-400 mb-6">
+                <MapPin size={24} />
               </div>
-              <h3 className="mb-2 text-xl font-bold">AI Predictions</h3>
-              <p className="text-muted-foreground">
-                Our model forecasts spot availability based on time, events, and historical trends.
+              <h2 className="text-2xl font-bold text-white mb-2">Find Parking</h2>
+              <p className="text-slate-400 text-sm mb-8">
+                View real-time availability and AI predictions. Save time and fuel.
               </p>
-            </div>
-            {/* Feature 2 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/50">
-                <Zap className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <div className="mt-auto space-y-3">
+                
+                {/* FIXED BUTTON: Using asChild for proper linking */}
+                <Button className="w-full bg-white text-slate-950 hover:bg-indigo-50 font-bold h-12 rounded-xl" asChild>
+                  <Link href="/map">
+                    Launch Live Map
+                  </Link>
+                </Button>
+
+                <Link href="/login" className="block text-center text-xs text-slate-500 hover:text-indigo-400 transition-colors">
+                  Sign In (Drivers)
+                </Link>
               </div>
-              <h3 className="mb-2 text-xl font-bold">Real-Time Data</h3>
-              <p className="text-muted-foreground">
-                Get live occupancy status from our connected lots, directly on your map.
-              </p>
-            </div>
-            {/* Feature 3 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-teal-100 dark:bg-teal-900/50">
-                <DollarSign className="h-6 w-6 text-teal-600 dark:text-teal-400" />
-              </div>
-              <h3 className="mb-2 text-xl font-bold">Dynamic Pricing</h3>
-              <p className="text-muted-foreground">
-                Prices adjust based on demand, helping you save money or maximize your lot's revenue.
-              </p>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Call to Action Cards Section */}
-      <section className="container mx-auto grid max-w-5xl grid-cols-1 gap-8 py-16 md:grid-cols-2 md:py-24">
-        
-        {/* Card 1: For Drivers (with Hover Glow) */}
-        <div className="relative group">
-          {/* The Glow Effect */}
-          <div className="absolute -inset-px rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-70" />
-          {/* The Card Content */}
-          <div className="relative flex h-full flex-col justify-between rounded-lg border bg-card p-6 shadow-sm dark:border-slate-800">
-            <div className="mb-6">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/50">
-                <Car className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+          {/* OWNER CARD */}
+          <div className="group relative overflow-hidden rounded-3xl bg-slate-900/50 border border-slate-800 p-8 hover:border-purple-500/50 transition-all duration-500 hover:shadow-[0_0_30px_-5px_rgba(168,85,247,0.2)]">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="w-12 h-12 rounded-2xl bg-purple-500/20 flex items-center justify-center border border-purple-500/30 text-purple-400 mb-6">
+                <TrendingUp size={24} />
               </div>
-              <h3 className="mb-2 text-2xl font-bold">For Drivers</h3>
-              <p className="text-muted-foreground">
-                Find the best spot, instantly. See real-time data and AI-powered predictions. Create a free account to save your favorite locations and view your parking history.
+              <h2 className="text-2xl font-bold text-white mb-2">List Your Lot</h2>
+              <p className="text-slate-400 text-sm mb-8">
+                Register your property. Use our Canvas tool to design spots and set dynamic pricing.
               </p>
+              <div className="mt-auto space-y-3">
+                
+                {/* FIXED BUTTON: Using asChild for proper linking */}
+                <Button variant="outline" className="w-full border-slate-700 text-white hover:bg-purple-950/30 hover:border-purple-500/50 hover:text-purple-300 h-12 rounded-xl" asChild>
+                  <Link href="/login">
+                    Sign In to Register Lot
+                  </Link>
+                </Button>
+
+                <div className="text-center text-xs text-slate-600">
+                   Manage your business from the dashboard
+                </div>
+              </div>
             </div>
-            <Link
-              href="/login"
-              className={`${buttonClasses} bg-secondary text-secondary-foreground hover:bg-secondary/80 w-full`}
-            >
-              Sign In to Park
-            </Link>
           </div>
         </div>
 
-        {/* Card 2: For Owners (with Hover Glow) */}
-        <div className="relative group">
-          {/* The Glow Effect */}
-          <div className="absolute -inset-px rounded-xl bg-gradient-to-r from-teal-500 to-purple-500 opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-70" />
-          {/* The Card Content */}
-          <div className="relative flex h-full flex-col justify-between rounded-lg border bg-card p-6 shadow-sm dark:border-slate-800">
-            <div className="mb-6">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-teal-100 dark:bg-teal-900/50">
-                <BarChart2 className="h-6 w-6 text-teal-600 dark:text-teal-400" />
-              </div>
-              <h3 className="mb-2 text-2xl font-bold">For Lot Owners</h3>
-              <p className="text-muted-foreground">
-                Turn your lot into a smart-revenue asset. Use our dashboard for demand forecasts, dynamic pricing, and real-time analytics to maximize your occupancy and income.
-              </p>
+        {/* 3. APP DATA & STATS */}
+        <div className="w-full max-w-5xl border-t border-slate-800 pt-16">
+            <div className="text-center mb-12">
+                <h3 className="text-xl font-semibold text-white">Powered by Data</h3>
+                <p className="text-slate-400 text-sm">Our ML models process thousands of data points hourly.</p>
             </div>
-            <Link
-              href="/register-lot"
-              className={`${buttonClasses} bg-secondary text-secondary-foreground hover:bg-secondary/80 w-full`}
-            >
-              Register Your Parking
-            </Link>
-          </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div className="text-center">
+                    <div className="text-3xl font-bold text-white mb-1">98%</div>
+                    <div className="text-xs uppercase tracking-wider text-slate-500">Prediction Accuracy</div>
+                </div>
+                <div className="text-center">
+                    <div className="text-3xl font-bold text-white mb-1">15k+</div>
+                    <div className="text-xs uppercase tracking-wider text-slate-500">Daily Predictions</div>
+                </div>
+                <div className="text-center">
+                    <div className="text-3xl font-bold text-white mb-1">24/7</div>
+                    <div className="text-xs uppercase tracking-wider text-slate-500">Real-time Monitoring</div>
+                </div>
+                <div className="text-center">
+                    <div className="text-3xl font-bold text-white mb-1">0.5s</div>
+                    <div className="text-xs uppercase tracking-wider text-slate-500">API Latency</div>
+                </div>
+            </div>
         </div>
 
-      </section>
-      
-      {/* Footer */}
-      <footer className="container py-8">
-        <p className="text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} ParkIntel. All rights reserved.
-        </p>
-      </footer>
+      </div>
     </main>
-  )
+  );
 }
