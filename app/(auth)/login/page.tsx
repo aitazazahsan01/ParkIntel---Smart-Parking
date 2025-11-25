@@ -1,12 +1,13 @@
+// app/(auth)/login/page.tsx
 "use client";
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Loader2, ShieldCheck } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function PublicLoginPage() {
+export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const handleGoogleLogin = async () => {
@@ -14,20 +15,30 @@ export default function PublicLoginPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
+        // FIX: Clean URL without query params
         redirectTo: `${location.origin}/auth/callback`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+          // We don't need to pass a role for generic login, 
+          // but if you did, it would go here, not in the URL.
+        },
       },
     });
-    if (error) console.error(error);
+    if (error) {
+        console.error("Login Error:", error);
+        setLoading(false);
+    }
   };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-white p-4 text-slate-900 dark:bg-slate-950 dark:text-white">
       
       <div className="w-full max-w-sm space-y-8 text-center animate-in fade-in zoom-in duration-500">
-        <div>
-          <h2 className="text-3xl font-extrabold tracking-tight">Welcome to ParkIntel</h2>
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            Sign in to find parking or manage your lot.
+        <div className="space-y-2">
+          <h2 className="text-3xl font-extrabold tracking-tight">Welcome Back</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Sign in to continue to ParkIntel
           </p>
         </div>
 
@@ -48,23 +59,18 @@ export default function PublicLoginPage() {
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
             )}
-            Continue with Google
+            Sign in with Google
           </Button>
         </div>
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-slate-200 dark:border-slate-800" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-slate-500 dark:bg-slate-950">Or</span>
-          </div>
+        <div className="text-sm text-slate-500">
+            Don't have an account? <Link href="/signup" className="text-indigo-600 font-semibold hover:underline">Join ParkIntel</Link>
         </div>
-
-        <div className="text-xs text-slate-400">
+        
+        <div className="mt-8 border-t pt-6 text-xs text-slate-400">
           Are you a parking attendant?{" "}
-          <Link href="/operator/login" className="text-indigo-600 hover:underline dark:text-indigo-400 font-bold">
-            Access Staff Portal
+          <Link href="/operator/login" className="text-slate-600 hover:text-indigo-600 hover:underline dark:text-slate-300 font-bold">
+            Staff Portal
           </Link>
         </div>
       </div>
