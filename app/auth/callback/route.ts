@@ -67,6 +67,7 @@ export async function GET(request: NextRequest) {
         }
       } else {
         console.log('👤 Existing user logging in...');
+        console.log('👤 User role:', existingProfile.role);
       }
     }
     
@@ -76,9 +77,25 @@ export async function GET(request: NextRequest) {
       console.log('➡️  Redirecting to complete-signup');
       return NextResponse.redirect(`${origin}/auth/complete-signup`)
     } else {
-      // Existing user - go directly to dashboard
-      console.log('➡️  Redirecting to dashboard');
-      return NextResponse.redirect(`${origin}/dashboard`)
+      // Existing user - check their role and redirect accordingly
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user!.id)
+        .single();
+      
+      console.log('➡️  Existing user role:', profile?.role);
+      
+      if (profile?.role === 'owner') {
+        console.log('➡️  Redirecting to owner dashboard');
+        return NextResponse.redirect(`${origin}/owner/dashboard`);
+      } else if (profile?.role === 'operator') {
+        console.log('➡️  Redirecting to operator dashboard');
+        return NextResponse.redirect(`${origin}/operator/dashboard`);
+      } else {
+        console.log('➡️  Redirecting to driver dashboard');
+        return NextResponse.redirect(`${origin}/dashboard`);
+      }
     }
   }
 

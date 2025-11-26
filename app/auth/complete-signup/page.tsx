@@ -38,40 +38,71 @@ export default function CompleteSignupPage() {
         
         const user = session.user;
         
-        // Get the pending role from localStorage
-        const pendingRole = localStorage.getItem('pendingUserRole');
-        console.log("📋 Pending role from localStorage:", pendingRole);
+        // Get the pending role from localStorage or sessionStorage (fallback)
+        let pendingRole = localStorage.getItem('pendingUserRole');
+        if (!pendingRole) {
+          pendingRole = sessionStorage.getItem('pendingUserRole');
+          console.log("📋 Retrieved pending role from sessionStorage:", pendingRole);
+        } else {
+          console.log("📋 Retrieved pending role from localStorage:", pendingRole);
+        }
+        
+        console.log("📋 Final pendingRole value:", pendingRole);
+        console.log("📋 All localStorage keys:", Object.keys(localStorage));
+        console.log("📋 All sessionStorage keys:", Object.keys(sessionStorage));
 
         // If there's a pending role, update the profile
         if (pendingRole && (pendingRole === 'driver' || pendingRole === 'owner' || pendingRole === 'operator')) {
           console.log("🔄 Updating profile role to:", pendingRole);
           
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error } = await (supabase as any)
+          const { data: updateData, error: updateError } = await supabase
             .from('profiles')
             .update({ role: pendingRole })
-            .eq('id', user.id);
+            .eq('id', user.id)
+            .select();
 
-          if (error) {
-            console.error("❌ Error updating role:", error);
+          console.log("📦 Update response data:", updateData);
+          console.log("📦 Update response error:", updateError);
+
+          if (updateError) {
+            console.error("❌ Error updating role:", updateError);
+            console.error("❌ Error details:", JSON.stringify(updateError, null, 2));
             setStatus("error");
             setTimeout(() => router.push('/auth/auth-code-error'), 2000);
             return;
           }
 
-          console.log("✅ Profile role updated successfully");
+          console.log("✅ Profile role updated successfully to:", pendingRole);
           
-          // Clear the pending role
+          // Clear the pending role from both storages
           localStorage.removeItem('pendingUserRole');
+          sessionStorage.removeItem('pendingUserRole');
+          console.log("🧹 Cleared pendingUserRole from both storages");
+          
+          // Redirect based on role
+          console.log("🎉 Signup complete, redirecting to appropriate dashboard");
+          if (pendingRole === 'owner') {
+            router.push('/owner/dashboard');
+          } else {
+            router.push('/dashboard');
+          }
         } else {
           console.log("ℹ️ No pending role to update (likely existing user login)");
-          // If no pending role, this might be an existing user who was redirected here by mistake
-          // Just proceed to dashboard
+          
+          // Get the user's current role from profile
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+          
+          // Redirect based on their existing role
+          if (profile?.role === 'owner') {
+            router.push('/owner/dashboard');
+          } else {
+            router.push('/dashboard');
+          }
         }
-
-        // Redirect to dashboard
-        console.log("🎉 Signup complete, redirecting to dashboard");
-        router.push('/dashboard');
       } catch (error) {
         console.error("❌ Complete signup error:", error);
         setStatus("error");
