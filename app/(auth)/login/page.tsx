@@ -61,74 +61,58 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      // Fetch user by username
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("id, username, password_hash, role, has_password, email")
-        .eq("username", username.toLowerCase())
-        .single();
-
-      if (profileError || !profile) {
-        setError("Invalid username or password");
-        setLoading(false);
-        return;
-      }
-
-      if (!profile.has_password || !profile.password_hash) {
-        setError("Please set up your password first by logging in with Google");
-        setLoading(false);
-        return;
-      }
-
-      // Verify password
-      const passwordMatch = await bcrypt.compare(password, profile.password_hash);
+      // Check if input is email or username
+      const isEmail = username.includes('@');
+      let loginEmail = username.trim().toLowerCase();
       
-      if (!passwordMatch) {
-        setError("Invalid username or password");
-        setLoading(false);
-        return;
-      }
-
-      // Try to sign in with Supabase using their actual email if available
-      if (profile.email) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: profile.email,
-          password: password,
-        });
-
-        if (!signInError) {
-          // Successfully signed in with Supabase
-          if (profile.role === "driver") {
-            router.push("/dashboard");
-          } else if (profile.role === "owner") {
-            router.push("/owner/dashboard");
-          } else {
-            router.push("/");
-          }
+      // If username provided, fetch email from profile
+      if (!isEmail) {
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("email")
+          .eq("username", username.trim().toLowerCase())
+          .maybeSingle();
+        
+        if (profileError || !profile || !profile.email) {
+          setError("Invalid username/email or password");
+          setLoading(false);
           return;
         }
-      }
-
-      // Fallback: Store session info in localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('username_session', JSON.stringify({
-          userId: profile.id,
-          username: profile.username,
-          role: profile.role,
-          loginTime: new Date().toISOString(),
-        }));
-      }
-
-      // Redirect based on role
-      if (profile.role === "driver") {
-        router.push("/dashboard");
-      } else if (profile.role === "owner") {
-        router.push("/owner/dashboard");
-      } else {
-        router.push("/");
+        
+        loginEmail = profile.email;
       }
       
-      setLoading(false);
+      // Login with email and password
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: loginEmail,
+        password: password,
+      });
+
+      if (signInError) {
+        setError("Invalid username/email or password");
+        setLoading(false);
+        return;
+      }
+
+      if (authData.user) {
+        // Fetch role from profile
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", authData.user.id)
+          .single();
+        
+        // Redirect based on role
+        const userRole = profile?.role || 'driver';
+        
+        if (userRole === "owner") {
+          router.push("/owner/dashboard");
+        } else if (userRole === "operator") {
+          router.push("/operator/dashboard");
+        } else {
+          router.push("/dashboard");
+        }
+      }
     } catch (err) {
       console.error("Login error:", err);
       setError("An error occurred during login");
@@ -181,7 +165,7 @@ export default function LoginPage() {
             <form onSubmit={handleUsernameLogin} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Username
+                  Username or Email
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
@@ -189,7 +173,7 @@ export default function LoginPage() {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value.toLowerCase())}
-                    placeholder="Enter your username"
+                    placeholder="Enter your username or email"
                     className="w-full pl-11 pr-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none"
                     required
                   />

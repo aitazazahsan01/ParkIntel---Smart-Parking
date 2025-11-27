@@ -51,9 +51,18 @@ export default function CompleteSignupPage() {
         console.log("📋 All localStorage keys:", Object.keys(localStorage));
         console.log("📋 All sessionStorage keys:", Object.keys(sessionStorage));
 
+        // Check current profile role before update
+        const { data: currentProfile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        
+        console.log("📋 Current profile role before update:", currentProfile?.role);
+
         // If there's a pending role, update the profile
         if (pendingRole && (pendingRole === 'driver' || pendingRole === 'owner' || pendingRole === 'operator')) {
-          console.log("🔄 Updating profile role to:", pendingRole);
+          console.log("🔄 Attempting to update profile role to:", pendingRole);
           
           const { data: updateData, error: updateError } = await supabase
             .from('profiles')
@@ -66,13 +75,28 @@ export default function CompleteSignupPage() {
 
           if (updateError) {
             console.error("❌ Error updating role:", updateError);
-            console.error("❌ Error details:", JSON.stringify(updateError, null, 2));
+            console.error("❌ Error code:", updateError.code);
+            console.error("❌ Error message:", updateError.message);
+            console.error("❌ Error details:", updateError.details);
+            console.error("❌ Error hint:", updateError.hint);
+            
+            // Show user-friendly error
+            alert(`Failed to set user role: ${updateError.message}. Please contact support.`);
             setStatus("error");
             setTimeout(() => router.push('/auth/auth-code-error'), 2000);
             return;
           }
 
           console.log("✅ Profile role updated successfully to:", pendingRole);
+          
+          // Verify the update worked
+          const { data: verifyProfile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+          
+          console.log("✅ Verified profile role after update:", verifyProfile?.role);
           
           // Clear the pending role from both storages
           localStorage.removeItem('pendingUserRole');

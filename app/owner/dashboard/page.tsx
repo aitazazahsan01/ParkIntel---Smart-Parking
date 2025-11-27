@@ -75,36 +75,42 @@ export default function OwnerDashboard() {
               <p className="text-sm text-slate-500 mt-1">Manage locations, pricing, and operators</p>
             </div>
             <div className="flex items-center gap-3">
-            <Button
-              onClick={() => router.push("/owner/settings")}
-              variant="outline"
-              className="border-slate-300 text-slate-700 hover:bg-slate-50"
-            >
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
-            </Button>
-            <Button
-              onClick={handleLogout}
-              disabled={loggingOut}
-              variant="outline"
-              className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
-            >
-              {loggingOut ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <LogOut className="mr-2 h-4 w-4" />
-              )}
-              {loggingOut ? "Logging out..." : "Logout"}
-            </Button>
-            <Button asChild className="bg-purple-600 hover:bg-purple-700">
-              <Link href="/owner/register-lot">
-                <Plus className="mr-2 h-4 w-4" />
-                Register New Lot
-              </Link>
-            </Button>
+              <Button
+                onClick={() => router.push("/owner/settings")}
+                variant="outline"
+                className="border-slate-300 text-slate-700 hover:bg-slate-50"
+              >
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </Button>
+              <Button
+                onClick={handleLogout}
+                disabled={loggingOut}
+                variant="outline"
+                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
+              >
+                {loggingOut ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <LogOut className="mr-2 h-4 w-4" />
+                )}
+                {loggingOut ? "Logging out..." : "Logout"}
+              </Button>
+              <Button asChild className="bg-purple-600 hover:bg-purple-700">
+                <Link href="/owner/register-lot">
+                  <>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Register New Lot
+                  </>
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
+      </div>
 
+      {/* Main Content */}
+      <div className="mx-auto max-w-7xl px-6 py-8">
         {/* Stats Grid */}
         <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-4">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
@@ -165,8 +171,10 @@ export default function OwnerDashboard() {
               </p>
               <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white">
                 <Link href="/owner/register-lot">
-                  <Plus className="mr-2 h-5 w-5" />
-                  Register Your First Lot
+                  <>
+                    <Plus className="mr-2 h-5 w-5" />
+                    Register Your First Lot
+                  </>
                 </Link>
               </Button>
             </div>

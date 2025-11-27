@@ -6,6 +6,9 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const next = searchParams.get('next') || '/auth/complete-signup'
+  
+  // Get the pending role from query params (we'll pass it from client)
+  const pendingRole = searchParams.get('role')
 
   if (code) {
     const cookieStore = await cookies()
@@ -39,6 +42,7 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     
     let isNewUser = false;
+    let userRole = 'driver'; // default
     
     if (user) {
       // Check if profile already exists
@@ -53,49 +57,76 @@ export async function GET(request: NextRequest) {
         isNewUser = true;
         console.log('🆕 New user detected, creating profile...');
         
-        // For new users, create profile with default role 'driver'
-        // The role will be updated from the client side using localStorage
+        // Determine role: use pendingRole from query params or default to 'driver'
+        if (pendingRole && ['driver', 'owner', 'operator'].includes(pendingRole)) {
+          userRole = pendingRole;
+          console.log(`✅ Setting role to: ${userRole} (from query params)`);
+        } else {
+          console.log('⚠️  No valid role in query params, defaulting to driver');
+        }
+        
+        // Get username from user metadata (set during signup)
+        const username = user.user_metadata.username;
+        
+        // Create profile with the correct role from the start
         const { error: insertError } = await supabase.from('profiles').insert({
           id: user.id,
           email: user.email,
-          role: 'driver', // default, will be updated
-          full_name: user.user_metadata.full_name || user.user_metadata.name
+          role: userRole,
+          full_name: user.user_metadata.full_name || user.user_metadata.name,
+          username: username || null, // Add username from metadata
         });
         
         if (insertError) {
-          console.error('Error creating profile:', insertError);
+          console.error('❌ Error creating profile:', insertError);
+        } else {
+          console.log(`✅ Profile created with role: ${userRole} and username: ${username}`);
         }
       } else {
-        console.log('👤 Existing user logging in...');
-        console.log('👤 User role:', existingProfile.role);
+        console.log('👤 Existing user found...');
+        console.log('👤 Current role in database:', existingProfile.role);
+        
+        // If user is coming from signup with a different role, update it
+        if (pendingRole && ['driver', 'owner', 'operator'].includes(pendingRole)) {
+          if (existingProfile.role !== pendingRole) {
+            console.log(`🔄 Updating role from "${existingProfile.role}" to "${pendingRole}"`);
+            
+            const { error: updateError } = await supabase
+              .from('profiles')
+              .update({ role: pendingRole })
+              .eq('id', user.id);
+            
+            if (updateError) {
+              console.error('❌ Error updating role:', updateError);
+              userRole = existingProfile.role; // Keep old role if update fails
+            } else {
+              console.log(`✅ Role updated to: ${pendingRole}`);
+              userRole = pendingRole; // Use new role
+            }
+          } else {
+            console.log('✅ Role already correct:', existingProfile.role);
+            userRole = existingProfile.role;
+          }
+        } else {
+          // No role in query params, use existing role (normal login)
+          console.log('ℹ️  No role in query params, using existing role');
+          userRole = existingProfile.role;
+        }
       }
     }
     
-    // Redirect based on whether this is a new signup or existing login
-    if (isNewUser) {
-      // New user - go to complete-signup to set role from localStorage
-      console.log('➡️  Redirecting to complete-signup');
-      return NextResponse.redirect(`${origin}/auth/complete-signup`)
+    // Redirect based on role (both new and existing users)
+    console.log(`➡️  Redirecting to dashboard based on role: ${userRole}`);
+    
+    if (userRole === 'owner') {
+      console.log('➡️  Redirecting to owner dashboard');
+      return NextResponse.redirect(`${origin}/owner/dashboard`);
+    } else if (userRole === 'operator') {
+      console.log('➡️  Redirecting to operator dashboard');
+      return NextResponse.redirect(`${origin}/operator/dashboard`);
     } else {
-      // Existing user - check their role and redirect accordingly
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user!.id)
-        .single();
-      
-      console.log('➡️  Existing user role:', profile?.role);
-      
-      if (profile?.role === 'owner') {
-        console.log('➡️  Redirecting to owner dashboard');
-        return NextResponse.redirect(`${origin}/owner/dashboard`);
-      } else if (profile?.role === 'operator') {
-        console.log('➡️  Redirecting to operator dashboard');
-        return NextResponse.redirect(`${origin}/operator/dashboard`);
-      } else {
-        console.log('➡️  Redirecting to driver dashboard');
-        return NextResponse.redirect(`${origin}/dashboard`);
-      }
+      console.log('➡️  Redirecting to driver dashboard');
+      return NextResponse.redirect(`${origin}/dashboard`);
     }
   }
 

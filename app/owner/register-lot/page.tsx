@@ -312,7 +312,6 @@ export default function ParkingPage() {
   };
 
   // --- SUPABASE SAVING LOGIC ---
-// --- SUPABASE SAVING LOGIC ---
   const handleSave = async () => {
     if (!lotName) {
         alert("Please enter a Parking Lot Name first.");
@@ -326,24 +325,49 @@ export default function ParkingPage() {
     setIsSaving(true);
 
     try {
-        // 1. Create the Parking Lot
-        // NOTE: We reference 'ParkingLots' (Case Sensitive) matching your DB
+        // Get the current user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+            console.error("User Error:", userError);
+            alert("You must be logged in to create a parking lot.");
+            setIsSaving(false);
+            return;
+        }
+
+        // 1. Create the Parking Lot with owner_id
         const { data: lotData, error: lotError } = await supabase
             .from('ParkingLots') 
-            .insert([{ 
+            .insert({ 
                 name: lotName, 
-                address: lotAddress, // Make sure you ran the SQL in Step 1
+                address: lotAddress || 'Address not provided',
                 lat: 0.0,            // Default value (required by your DB)
                 lng: 0.0,            // Default value (required by your DB)
                 capacity: spots.length, // Auto-calculate capacity
-                base_price: 10.0     // Default price
-            }])
+                base_price: 10.0,    // Default price
+                owner_id: user.id    // Link to the current user
+            })
             .select()
             .single();
 
         if (lotError) {
-            console.error("Supabase Lot Error:", lotError); // Log the specific error
-            throw lotError;
+            console.error("Supabase Lot Error:", lotError);
+            
+            // Handle specific error cases
+            if (lotError.code === '23505') {
+                alert("A parking lot with this name already exists. Please use a different name.");
+            } else {
+                alert("Error creating parking lot: " + lotError.message);
+            }
+            
+            setIsSaving(false);
+            return;
+        }
+        
+        if (!lotData || !lotData.id) {
+            alert("Failed to create parking lot. Please try again.");
+            setIsSaving(false);
+            return;
         }
         
         const lotId = lotData.id;
@@ -364,15 +388,30 @@ export default function ParkingPage() {
 
         if (spotsError) {
             console.error("Supabase Spot Error:", spotsError);
-            throw spotsError;
+            alert("Error creating parking spots: " + spotsError.message);
+            setIsSaving(false);
+            return;
         }
 
-        alert("Parking Layout Saved Successfully!");
-        // router.push('/dashboard'); 
+        // Success! Clear the form and show success message
+        alert(`✅ Parking Lot "${lotName}" saved successfully with ${spots.length} spots!`);
+        
+        // Reset the form
+        setLotName("");
+        setLotAddress("");
+        setSpots([]);
+        setNextId(1);
+        setSelectedSpotId(null);
+        setGhostSpot(null);
+        
+        // Optionally redirect to dashboard
+        setTimeout(() => {
+            router.push('/owner/dashboard');
+        }, 1500);
 
     } catch (error: any) {
-        console.error("Full Error Object:", error);
-        alert("Error saving layout: " + (error.message || "Check console for details"));
+        console.error("Unexpected Error:", error);
+        alert("Unexpected error: " + (error.message || "Please check console"));
     } finally {
         setIsSaving(false);
     }

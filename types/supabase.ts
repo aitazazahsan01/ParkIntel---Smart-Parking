@@ -118,6 +118,7 @@ export type Database = {
           lat: number
           lng: number
           name: string | null
+          owner_id: string | null
         }
         Insert: {
           address?: string | null
@@ -127,6 +128,7 @@ export type Database = {
           lat: number
           lng: number
           name?: string | null
+          owner_id?: string | null
         }
         Update: {
           address?: string | null
@@ -136,8 +138,17 @@ export type Database = {
           lat?: number
           lng?: number
           name?: string | null
+          owner_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "parkinglots_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
