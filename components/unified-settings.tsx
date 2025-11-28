@@ -218,7 +218,7 @@ export default function UnifiedSettings({ role, dashboardPath }: UnifiedSettings
   const themeColor = role === 'owner' ? 'purple' : 'indigo';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-slate-50">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-indigo-50/30 to-slate-50">
       {/* Header */}
       <div className="border-b border-slate-200 bg-white/80 backdrop-blur-sm">
         <div className="mx-auto max-w-4xl px-6 py-4">

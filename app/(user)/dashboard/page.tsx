@@ -88,7 +88,7 @@ export default function DriverDashboard() {
   const completedSessions = sessions.filter((s) => s.status === "completed").length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-slate-50">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-indigo-50/30 to-slate-50">
       {/* Header */}
       <div className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
         <div className="mx-auto max-w-7xl px-6 py-4">

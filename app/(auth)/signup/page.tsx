@@ -20,7 +20,7 @@ export default function SignUpSelectionPage() {
   return (
     <div className="relative flex min-h-screen overflow-hidden">
       {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950" />
+      <div className="absolute inset-0 bg-linear-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950" />
       
       {/* Animated Background Elements */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
@@ -30,14 +30,14 @@ export default function SignUpSelectionPage() {
       <div className="relative flex flex-1 flex-col items-center justify-center p-4 py-12">
         {/* Header */}
         <div className="mb-12 text-center max-w-3xl">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 shadow-lg mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-linear-to-br from-indigo-600 to-purple-600 shadow-lg mb-6">
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
           <h1 className="text-5xl font-extrabold text-slate-900 dark:text-white mb-4">
             Start Your Journey with{" "}
-            <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               ParkIntel
             </span>
           </h1>
@@ -50,14 +50,14 @@ export default function SignUpSelectionPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             
-            {/* DRIVER OPTION */}
+            {/* DRIVER CARD */}
             <div className="group relative overflow-hidden rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-10 transition-all hover:scale-[1.02] border-2 border-transparent hover:border-indigo-500 hover:shadow-2xl dark:border-slate-700/50">
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-linear-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 
                 <div className="relative">
                   {/* Icon */}
-                  <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg group-hover:shadow-indigo-500/50 transition-shadow">
+                  <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 to-indigo-600 text-white shadow-lg group-hover:shadow-indigo-500/50 transition-shadow">
                       <Car size={32} strokeWidth={2.5} />
                   </div>
                   
@@ -95,21 +95,21 @@ export default function SignUpSelectionPage() {
                   
                   <Button 
                       onClick={handleDriverSignup}
-                      className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
+                      className="w-full bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
                   >
                       Get Started as Driver
                   </Button>
                 </div>
             </div>
 
-            {/* OWNER OPTION */}
+            {/* OWNER CARD */}
             <div className="group relative overflow-hidden rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-10 transition-all hover:scale-[1.02] border-2 border-transparent hover:border-purple-500 hover:shadow-2xl dark:border-slate-700/50">
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-linear-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 
                 <div className="relative">
                   {/* Icon */}
-                  <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg group-hover:shadow-purple-500/50 transition-shadow">
+                  <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-purple-500 to-purple-600 text-white shadow-lg group-hover:shadow-purple-500/50 transition-shadow">
                       <Building2 size={32} strokeWidth={2.5} />
                   </div>
                   
@@ -147,7 +147,7 @@ export default function SignUpSelectionPage() {
                   
                   <Button 
                       onClick={handleOwnerSignup}
-                      className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
+                      className="w-full bg-linear-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
                   >
                       Register Your Business
                   </Button>

@@ -180,7 +180,7 @@ export default function OwnerSignUpPage() {
   return (
     <div className="relative flex min-h-screen overflow-hidden">
       {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-slate-950 dark:via-slate-900 dark:to-purple-950" />
+      <div className="absolute inset-0 bg-linear-to-br from-purple-50 via-white to-pink-50 dark:from-slate-950 dark:via-slate-900 dark:to-purple-950" />
       
       {/* Animated Background Elements */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
@@ -199,12 +199,12 @@ export default function OwnerSignUpPage() {
 
         {/* Header */}
         <div className="mb-12 text-center max-w-2xl">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-purple-600 to-pink-600 shadow-2xl mb-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-linear-to-br from-purple-600 to-pink-600 shadow-2xl mb-8">
             <Building2 className="w-10 h-10 text-white" strokeWidth={2.5} />
           </div>
           <h1 className="text-5xl font-extrabold text-slate-900 dark:text-white mb-4">
             Join as a{" "}
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               Lot Owner
             </span>
           </h1>
@@ -263,7 +263,7 @@ export default function OwnerSignUpPage() {
                   <Button 
                     onClick={handleGoogleSignUp}
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
+                    className="w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
                   >
                     {loading ? (
                       <>
@@ -421,7 +421,7 @@ export default function OwnerSignUpPage() {
                   {successMessage && (
                     <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-sm text-green-700 dark:text-green-400">
                       <div className="flex items-start gap-3">
-                        <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-5 h-5 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <span>{successMessage}</span>
@@ -440,7 +440,7 @@ export default function OwnerSignUpPage() {
                   <Button 
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white h-12 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
+                    className="w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white h-12 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
                   >
                     {loading ? (
                       <>

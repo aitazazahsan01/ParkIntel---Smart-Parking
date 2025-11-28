@@ -43,7 +43,7 @@ export default function WelcomePage() {
           
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-2xl">
             The Future of <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-400 via-purple-400 to-indigo-400">
               Urban Mobility.
             </span>
           </h1>
@@ -59,7 +59,7 @@ export default function WelcomePage() {
           
           {/* DRIVER CARD */}
           <div className="group relative overflow-hidden rounded-3xl bg-slate-900/50 border border-slate-800 p-8 hover:border-indigo-500/50 transition-all duration-500 hover:shadow-[0_0_30px_-5px_rgba(99,102,241,0.2)]">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-linear-to-br from-indigo-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative z-10 flex flex-col h-full">
               <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 text-indigo-400 mb-6">
                 <MapPin size={24} />
@@ -71,14 +71,14 @@ export default function WelcomePage() {
               <div className="mt-auto space-y-3">
                 
                 {/* FIXED BUTTON: Using asChild for proper linking */}
-                <Button className="w-full bg-white text-slate-950 hover:bg-indigo-50 font-bold h-12 rounded-xl" asChild>
-                  <Link href="/map">
-                    Launch Live Map
+                <Button className="w-full bg-indigo-600 text-white hover:bg-indigo-700 font-bold h-12 rounded-xl" asChild>
+                  <Link href="/login">
+                    Sign In to View Map
                   </Link>
                 </Button>
 
-                <Link href="/login" className="block text-center text-xs text-slate-500 hover:text-indigo-400 transition-colors">
-                  Sign In (Drivers)
+                <Link href="/signup/driver" className="block text-center text-xs text-slate-500 hover:text-indigo-400 transition-colors">
+                  New User? Create Account
                 </Link>
               </div>
             </div>
@@ -86,7 +86,7 @@ export default function WelcomePage() {
 
           {/* OWNER CARD */}
           <div className="group relative overflow-hidden rounded-3xl bg-slate-900/50 border border-slate-800 p-8 hover:border-purple-500/50 transition-all duration-500 hover:shadow-[0_0_30px_-5px_rgba(168,85,247,0.2)]">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-linear-to-br from-purple-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative z-10 flex flex-col h-full">
               <div className="w-12 h-12 rounded-2xl bg-purple-500/20 flex items-center justify-center border border-purple-500/30 text-purple-400 mb-6">
                 <TrendingUp size={24} />

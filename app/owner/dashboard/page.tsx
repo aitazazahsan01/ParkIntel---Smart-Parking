@@ -65,7 +65,7 @@ export default function OwnerDashboard() {
   const totalRevenue = lots.reduce((acc, lot) => acc + (lot.revenue || 0), 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-slate-50">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/30 to-slate-50">
       {/* Header */}
       <div className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
         <div className="mx-auto max-w-7xl px-6 py-4">
@@ -189,7 +189,7 @@ export default function OwnerDashboard() {
               {lots.map((lot) => (
                 <div key={lot.id} className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:border-purple-300 hover:shadow-lg">
                   {/* Image/Banner */}
-                  <div className="h-40 w-full bg-gradient-to-br from-purple-500 to-indigo-600 relative overflow-hidden">
+                  <div className="h-40 w-full bg-linear-to-br from-purple-500 to-indigo-600 relative overflow-hidden">
                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
                     <div className="absolute bottom-3 right-3">
                       <span className="px-3 py-1 rounded-full bg-white/90 text-xs font-semibold text-purple-900">
@@ -204,7 +204,7 @@ export default function OwnerDashboard() {
                       {lot.name}
                     </h3>
                     <p className="mb-4 flex items-start text-sm text-slate-500">
-                      <MapPin size={16} className="mr-2 mt-0.5 flex-shrink-0" />
+                      <MapPin size={16} className="mr-2 mt-0.5 shrink-0" />
                       <span>{lot.address || "No address provided"}</span>
                     </p>
                     
