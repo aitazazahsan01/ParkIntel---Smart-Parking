@@ -50,10 +50,26 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Redirect authenticated users away from auth pages
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
+  // Redirect authenticated users away from auth pages based on their role
+  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup' || request.nextUrl.pathname.startsWith('/signup/'))) {
+    // Fetch user role from profiles table
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
+    
+    // Redirect based on role
+    if (profile?.role === 'owner') {
+      url.pathname = '/owner/dashboard'
+    } else if (profile?.role === 'operator') {
+      url.pathname = '/operator/dashboard'
+    } else {
+      url.pathname = '/dashboard'
+    }
+    
     return NextResponse.redirect(url)
   }
 

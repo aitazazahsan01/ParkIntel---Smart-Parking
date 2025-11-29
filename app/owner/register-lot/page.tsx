@@ -158,11 +158,21 @@ export default function ParkingPage() {
   const [canvasSize, setCanvasSize] = useState({ width: 500, height: 500 });
   const [ghostSpot, setGhostSpot] = useState<UISpot | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   // Inputs
   const [lotName, setLotName] = useState("");
   const [lotAddress, setLotAddress] = useState("");
+  const [basePrice, setBasePrice] = useState<string>("50");
+  const [releaseBuffer, setReleaseBuffer] = useState<string>("1.8");
+  
+  // Map selection states
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const mapMarkerRef = useRef<google.maps.Marker | null>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
   
   const canvasRef = useRef<HTMLDivElement>(null);
   const isResizing = useRef(false);
@@ -311,6 +321,127 @@ export default function ParkingPage() {
     document.addEventListener('mouseup', stopDrag);
   };
 
+  // Initialize Google Maps
+  useEffect(() => {
+    if (!showMapModal || !mapContainerRef.current) return;
+    
+    const initMap = () => {
+      if (!window.google || !mapContainerRef.current) return;
+      
+      const defaultCenter = selectedLocation || { lat: 33.5651, lng: 73.0169 };
+      
+      const map = new google.maps.Map(mapContainerRef.current, {
+        center: defaultCenter,
+        zoom: 15,
+        disableDefaultUI: false,
+        streetViewControl: false,
+        mapTypeControl: false,
+      });
+      
+      mapRef.current = map;
+      
+      // Add click listener to map
+      map.addListener('click', (e: google.maps.MapMouseEvent) => {
+        if (e.latLng) {
+          const lat = e.latLng.lat();
+          const lng = e.latLng.lng();
+          
+          // Remove old marker if it exists (only one marker allowed)
+          if (mapMarkerRef.current) {
+            mapMarkerRef.current.setMap(null);
+            mapMarkerRef.current = null;
+          }
+          
+          // Create new marker
+          const newMarker = new google.maps.Marker({
+            position: { lat, lng },
+            map: map,
+            draggable: true,
+            animation: google.maps.Animation.DROP,
+          });
+          
+          // Store the new marker in ref
+          mapMarkerRef.current = newMarker;
+          setSelectedLocation({ lat, lng });
+          
+          // Update location when marker is dragged
+          newMarker.addListener('dragend', () => {
+            const pos = newMarker.getPosition();
+            if (pos) {
+              setSelectedLocation({ lat: pos.lat(), lng: pos.lng() });
+            }
+          });
+        }
+      });
+      
+      // If there's already a selected location, add marker
+      if (selectedLocation) {
+        const marker = new google.maps.Marker({
+          position: selectedLocation,
+          map: map,
+          draggable: true,
+          animation: google.maps.Animation.DROP,
+        });
+        
+        mapMarkerRef.current = marker;
+        
+        marker.addListener('dragend', () => {
+          const pos = marker.getPosition();
+          if (pos) {
+            setSelectedLocation({ lat: pos.lat(), lng: pos.lng() });
+          }
+        });
+      }
+    };
+    
+    // Wait for Google Maps to load
+    const checkGoogleMaps = setInterval(() => {
+      if (window.google) {
+        clearInterval(checkGoogleMaps);
+        initMap();
+      }
+    }, 100);
+    
+    return () => {
+      clearInterval(checkGoogleMaps);
+      // Clean up marker when modal closes
+      if (mapMarkerRef.current) {
+        mapMarkerRef.current.setMap(null);
+        mapMarkerRef.current = null;
+      }
+    };
+  }, [showMapModal]);
+
+  const handleOpenMapModal = () => {
+    if (!lotName) {
+      alert("Please enter a Parking Lot Name first.");
+      return;
+    }
+    if (spots.length === 0) {
+      alert("Please add at least one parking spot before selecting location.");
+      return;
+    }
+    if (!basePrice || parseFloat(basePrice) <= 0) {
+      alert("Please enter a valid Base Price (must be greater than 0).");
+      return;
+    }
+    if (!releaseBuffer || parseFloat(releaseBuffer) < 1) {
+      alert("Please enter a valid Release Buffer multiplier (must be at least 1.0).");
+      return;
+    }
+    setShowMapModal(true);
+  };
+
+  const handleConfirmLocation = () => {
+    if (!selectedLocation) {
+      alert("Please select a location on the map by clicking.");
+      return;
+    }
+    setShowMapModal(false);
+    // Proceed to save
+    handleSave();
+  };
+
   // --- SUPABASE SAVING LOGIC ---
   const handleSave = async () => {
     if (!lotName) {
@@ -319,6 +450,10 @@ export default function ParkingPage() {
     }
     if (spots.length === 0) {
         alert("Please add at least one parking spot.");
+        return;
+    }
+    if (!selectedLocation) {
+        alert("Please select a location on the map.");
         return;
     }
 
@@ -335,16 +470,17 @@ export default function ParkingPage() {
             return;
         }
 
-        // 1. Create the Parking Lot with owner_id
+        // 1. Create the Parking Lot with owner_id and location
         const { data: lotData, error: lotError } = await supabase
             .from('ParkingLots') 
             .insert({ 
                 name: lotName, 
                 address: lotAddress || 'Address not provided',
-                lat: 0.0,            // Default value (required by your DB)
-                lng: 0.0,            // Default value (required by your DB)
-                capacity: spots.length, // Auto-calculate capacity
-                base_price: 10.0,    // Default price
+                lat: selectedLocation.lat,
+                lng: selectedLocation.lng,
+                total_spots: spots.length, // Total capacity
+                price_per_hour: parseFloat(basePrice), // User-defined price
+                release_buffer_multiplier: parseFloat(releaseBuffer), // User-defined buffer
                 owner_id: user.id    // Link to the current user
             })
             .select()
@@ -352,12 +488,26 @@ export default function ParkingPage() {
 
         if (lotError) {
             console.error("Supabase Lot Error:", lotError);
+            console.error("Full error details:", JSON.stringify(lotError, null, 2));
             
             // Handle specific error cases
             if (lotError.code === '23505') {
-                alert("A parking lot with this name already exists. Please use a different name.");
-            } else {
+                if (lotError.message && lotError.message.includes('ParkingLots_pkey')) {
+                    alert("⚠️ DATABASE ERROR: Parking Lot ID Sequence Out of Sync\n\n" +
+                          "TO FIX THIS:\n" +
+                          "1. Open Supabase SQL Editor\n" +
+                          "2. Run the file: FIX_PARKINGLOTS_SEQUENCE.sql\n" +
+                          "3. Try creating your parking lot again\n\n" +
+                          "This happens when the auto-increment ID counter gets reset.");
+                } else {
+                    alert("A parking lot with this name already exists. Please use a different name.");
+                }
+            } else if (lotError.code === '42501') {
+                alert("Permission denied. Please make sure you are logged in as an owner.");
+            } else if (lotError.message) {
                 alert("Error creating parking lot: " + lotError.message);
+            } else {
+                alert("Error creating parking lot. Please check console for details.");
             }
             
             setIsSaving(false);
@@ -394,20 +544,23 @@ export default function ParkingPage() {
         }
 
         // Success! Clear the form and show success message
-        alert(`✅ Parking Lot "${lotName}" saved successfully with ${spots.length} spots!`);
+        setSuccessMsg(`Parking Lot "${lotName}" saved successfully with ${spots.length} spots!`);
         
         // Reset the form
         setLotName("");
         setLotAddress("");
+        setBasePrice("50");
+        setReleaseBuffer("1.8");
         setSpots([]);
         setNextId(1);
         setSelectedSpotId(null);
         setGhostSpot(null);
+        setSelectedLocation(null);
         
-        // Optionally redirect to dashboard
+        // Redirect to dashboard after showing success message
         setTimeout(() => {
             router.push('/owner/dashboard');
-        }, 1500);
+        }, 2000);
 
     } catch (error: any) {
         console.error("Unexpected Error:", error);
@@ -431,6 +584,11 @@ export default function ParkingPage() {
             {errorMsg && (
                 <span className="ml-3 inline-flex items-center gap-1 rounded bg-red-50 px-2 py-0.5 text-xs font-bold text-red-600 animate-pulse border border-red-200">
                     <AlertCircle size={12} /> {errorMsg}
+                </span>
+            )}
+            {successMsg && (
+                <span className="ml-3 inline-flex items-center gap-1 rounded bg-green-50 px-3 py-1.5 text-sm font-bold text-green-700 animate-pulse border border-green-300 shadow-sm">
+                    ✅ {successMsg}
                 </span>
             )}
           </p>
@@ -459,16 +617,56 @@ export default function ParkingPage() {
                 />
             </div>
 
+            {/* Base Price Input */}
+            <div className="flex items-center rounded-md border border-slate-300 bg-slate-50 px-3 py-2 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
+                <span className="font-medium text-slate-500 mr-2 text-xs">PRICE:</span>
+                <input 
+                    type="number"
+                    step="10"
+                    min="0"
+                    className="bg-transparent text-sm outline-none w-20 text-slate-800 font-medium" 
+                    placeholder="50"
+                    value={basePrice}
+                    onChange={e => setBasePrice(e.target.value)}
+                />
+                <span className="text-xs text-slate-500 ml-1">Rs/hr</span>
+            </div>
+
+            {/* Release Buffer Input */}
+            <div className="flex items-center rounded-md border border-slate-300 bg-slate-50 px-3 py-2 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
+                <span className="font-medium text-slate-500 mr-2 text-xs">BUFFER:</span>
+                <input 
+                    type="number"
+                    step="0.1"
+                    min="1"
+                    max="5"
+                    className="bg-transparent text-sm outline-none w-16 text-slate-800 font-medium" 
+                    placeholder="1.8"
+                    value={releaseBuffer}
+                    onChange={e => setReleaseBuffer(e.target.value)}
+                />
+                <span className="text-xs text-slate-500 ml-1">×</span>
+            </div>
+
             <div className="h-8 w-px bg-slate-300 mx-1 hidden md:block"></div>
 
-            {/* Save Button */}
+            {/* Select Location & Publish Button */}
             <button 
-                onClick={handleSave} 
+                onClick={handleOpenMapModal} 
                 disabled={isSaving}
                 className="flex items-center gap-2 rounded-md bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white shadow hover:bg-indigo-700 transition-transform active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-                {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-                {isSaving ? "Publishing..." : "Publish Layout"}
+                {selectedLocation ? (
+                  <>
+                    <Save size={16} />
+                    Publish Layout
+                  </>
+                ) : (
+                  <>
+                    <MapPin size={16} />
+                    Select Location
+                  </>
+                )}
             </button>
         </div>
       </header>
@@ -628,6 +826,79 @@ export default function ParkingPage() {
           </div>
         </main>
       </div>
+
+      {/* MAP SELECTION MODAL */}
+      {showMapModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-4xl h-[600px] m-4 bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+            {/* Modal Header */}
+            <div className="absolute top-0 left-0 right-0 z-10 bg-white/95 backdrop-blur-sm border-b border-slate-200 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900">Select Parking Location</h2>
+                  <p className="text-sm text-slate-500 mt-0.5">
+                    Click on the map to place your parking lot marker
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowMapModal(false)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+                >
+                  <span className="text-xl">×</span>
+                </button>
+              </div>
+              
+              {selectedLocation && (
+                <div className="mt-3 flex items-center gap-2 text-xs text-slate-600 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                  <MapPin size={14} className="text-emerald-600" />
+                  <span className="font-mono">
+                    Lat: {selectedLocation.lat.toFixed(6)}, Lng: {selectedLocation.lng.toFixed(6)}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Map Container */}
+            <div ref={mapContainerRef} className="w-full h-full pt-28 pb-20"></div>
+
+            {/* Modal Footer */}
+            <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-slate-500">
+                  {selectedLocation 
+                    ? "Location selected! Click confirm to save." 
+                    : "Click anywhere on the map to select your parking location"}
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowMapModal(false)}
+                    className="px-4 py-2 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleConfirmLocation}
+                    disabled={!selectedLocation || isSaving}
+                    className="px-6 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="animate-spin" size={16} />
+                        Publishing...
+                      </>
+                    ) : (
+                      <>
+                        <Save size={16} />
+                        Confirm & Publish
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
