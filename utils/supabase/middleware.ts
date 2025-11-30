@@ -43,6 +43,14 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/')
   )
 
+  // Operator routes don't use Supabase auth - they use localStorage
+  const isOperatorRoute = request.nextUrl.pathname.startsWith('/operator') || 
+                          request.nextUrl.pathname.startsWith('/auth/operator')
+  
+  if (isOperatorRoute) {
+    return supabaseResponse
+  }
+
   // Redirect to login if no user and trying to access protected route
   if (!user && !isPublicPath && request.nextUrl.pathname !== '/') {
     const url = request.nextUrl.clone()

@@ -5,10 +5,11 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { Loader2, AlertCircle, Terminal, Key, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import bcrypt from "bcryptjs";
 
 export default function OperatorLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -18,17 +19,52 @@ export default function OperatorLoginPage() {
     setLoading(true);
     setErrorMsg(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      // First, fetch the operator record to get the stored password hash
+      const { data: operators, error: fetchError } = await supabase
+        .from("operators")
+        .select("id, username, password_hash, full_name, owner_id, assigned_lots, is_active")
+        .eq("username", username)
+        .eq("is_active", true)
+        .single();
 
-    if (error) {
-      setErrorMsg("Invalid Credentials. Access Denied.");
+      if (fetchError || !operators) {
+        setErrorMsg("Invalid username or password.");
+        setLoading(false);
+        return;
+      }
+
+      // Verify the password using bcrypt
+      const isPasswordValid = await bcrypt.compare(password, operators.password_hash);
+
+      if (!isPasswordValid) {
+        setErrorMsg("Invalid username or password.");
+        setLoading(false);
+        return;
+      }
+
+      // Update last login timestamp
+      await supabase
+        .from("operators")
+        .update({ last_login: new Date().toISOString() })
+        .eq("id", operators.id);
+
+      // Store operator info in localStorage
+      const operatorData = {
+        id: operators.id,
+        username: operators.username,
+        full_name: operators.full_name,
+        owner_id: operators.owner_id,
+        assigned_lots: operators.assigned_lots,
+      };
+      localStorage.setItem("operator", JSON.stringify(operatorData));
+      
+      // Redirect to operator dashboard
+      router.push("/operator/dashboard");
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      setErrorMsg("An unexpected error occurred. Please try again.");
       setLoading(false);
-    } else {
-      // Successful login
-      router.push("/operator/dashboard"); // We will build this later
     }
   };
 
@@ -56,16 +92,16 @@ export default function OperatorLoginPage() {
           )}
 
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase text-slate-500">Operator ID</label>
+            <label className="text-xs font-bold uppercase text-slate-500">Username</label>
             <div className="relative">
               <User className="absolute left-3 top-3 h-4 w-4 text-slate-600" />
               <input
-                type="email"
+                type="text"
                 required
                 className="w-full rounded border border-slate-800 bg-slate-950 py-2.5 pl-10 text-sm text-white placeholder:text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                placeholder="staff@parkintel.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="operator_username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
           </div>
