@@ -17,6 +17,10 @@ export interface ParkingLot {
   capacity: number;
   base_price: number;
   owner_id?: string | null;
+  // Real availability data from database
+  total_spots?: number;
+  available_spots?: number;
+  occupied_spots?: number;
 }
 
 export interface TravelEstimate {
@@ -50,7 +54,113 @@ interface LotPrediction {
   probability: number; // 0-1
   confidenceLabel: string;
   dynamicPrice: number;
+  // ML model metadata
+  source: 'real-time' | 'ml-prediction'; // Track data source
+  lastUpdated?: Date;
+  modelVersion?: string;
 }
+
+// ============================================
+// ML MODEL API INTEGRATION PLACEHOLDER
+// ============================================
+/**
+ * TODO: Replace this function with actual ML model API call
+ * 
+ * Expected ML Model API Endpoint:
+ * POST /api/ml/predict-availability
+ * 
+ * Request Body:
+ * {
+ *   lot_id: number,
+ *   timestamp: ISO8601 string,
+ *   day_of_week: string,
+ *   hour: number,
+ *   historical_data: {
+ *     avg_occupancy_same_hour: number,
+ *     avg_occupancy_same_day: number,
+ *     nearby_events: Event[],
+ *     weather_conditions: object,
+ *     holiday_flag: boolean
+ *   }
+ * }
+ * 
+ * Response:
+ * {
+ *   lot_id: number,
+ *   predicted_availability: number, // 0-1 (0=full, 1=empty)
+ *   confidence: number, // 0-1
+ *   confidence_label: 'High' | 'Medium' | 'Low',
+ *   factors: {
+ *     time_influence: number,
+ *     event_influence: number,
+ *     historical_pattern: number,
+ *     weather_influence: number
+ *   },
+ *   model_version: string,
+ *   timestamp: ISO8601 string
+ * }
+ * 
+ * Features to train ML model on:
+ * - Hour of day (0-23)
+ * - Day of week (0-6)
+ * - Month of year (1-12)
+ * - Is weekend (boolean)
+ * - Is holiday (boolean)
+ * - Weather conditions (sunny, rainy, etc.)
+ * - Nearby events (concerts, matches, festivals)
+ * - Historical occupancy patterns
+ * - Lot capacity
+ * - Lot location (lat, lng, area type)
+ * - Seasonal trends
+ */
+async function fetchMLPrediction(lot: ParkingLot): Promise<LotPrediction> {
+  // TODO: Replace with actual API call
+  // const response = await fetch('/api/ml/predict-availability', {
+  //   method: 'POST',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify({
+  //     lot_id: lot.id,
+  //     timestamp: new Date().toISOString(),
+  //     day_of_week: new Date().toLocaleDateString('en-US', { weekday: 'long' }),
+  //     hour: new Date().getHours(),
+  //     historical_data: {
+  //       // Pull from your database
+  //     }
+  //   })
+  // });
+  // const mlData = await response.json();
+  // return {
+  //   lotId: lot.id,
+  //   probability: mlData.predicted_availability,
+  //   confidenceLabel: mlData.confidence_label,
+  //   dynamicPrice: calculateDynamicPrice(lot.base_price, mlData.predicted_availability),
+  //   source: 'ml-prediction',
+  //   lastUpdated: new Date(mlData.timestamp),
+  //   modelVersion: mlData.model_version
+  // };
+  
+  // TEMPORARY: Placeholder ML simulation logic (REMOVE WHEN MODEL IS READY)
+  const now = new Date();
+  const hourFactor = Math.cos((now.getHours() / 24) * Math.PI * 2);
+  const dayFactor = now.getDay() === 0 || now.getDay() === 6 ? 0.15 : 0;
+  const capacityScore = Math.min(1, lot.capacity / 150);
+  const baseScore = 0.5 + capacityScore * 0.3 - dayFactor;
+  const timeInfluence = hourFactor * 0.15;
+  const probability = Math.min(0.97, Math.max(0.08, baseScore - timeInfluence + Math.random() * 0.1));
+  
+  return {
+    lotId: lot.id,
+    probability,
+    confidenceLabel: probability >= 0.75 ? "High" : probability <= 0.35 ? "Low" : "Medium",
+    dynamicPrice: Math.max(50, Math.round(lot.base_price * (1 + (0.6 - probability) * 0.35))),
+    source: 'ml-prediction',
+    lastUpdated: new Date(),
+    modelVersion: 'placeholder-v0.1'
+  };
+}
+// ============================================
+// END ML MODEL API INTEGRATION PLACEHOLDER
+// ============================================
 
 const STORAGE_KEY = "parkintel-prebookings";
 const MAX_BOOKINGS = 2;
@@ -80,37 +190,10 @@ export function SmartParkingMap({
   const [mlSimulationTick, setMlSimulationTick] = useState(0);
   const [isMapReady, setIsMapReady] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<Array<{name: string; lat: number; lng: number}>>([]);
+  const [placePredictions, setPlacePredictions] = useState<google.maps.places.AutocompletePrediction[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
-
-  // Predefined popular locations in Rawalpindi/Islamabad
-  const popularLocations = useMemo(() => [
-    { name: "Saddar, Rawalpindi", lat: 33.5989, lng: 73.0551 },
-    { name: "Blue Area, Islamabad", lat: 33.7104, lng: 73.0619 },
-    { name: "F-6 Markaz, Islamabad", lat: 33.7268, lng: 73.0704 },
-    { name: "F-7 Markaz, Islamabad", lat: 33.7194, lng: 73.0597 },
-    { name: "F-8 Markaz, Islamabad", lat: 33.7100, lng: 73.0400 },
-    { name: "F-10 Markaz, Islamabad", lat: 33.6947, lng: 73.0167 },
-    { name: "G-9 Markaz, Islamabad", lat: 33.6858, lng: 73.0333 },
-    { name: "G-10 Markaz, Islamabad", lat: 33.6750, lng: 73.0167 },
-    { name: "G-11 Markaz, Islamabad", lat: 33.6650, lng: 73.0000 },
-    { name: "I-8 Markaz, Islamabad", lat: 33.6667, lng: 73.0667 },
-    { name: "Bahria Town, Rawalpindi", lat: 33.5231, lng: 73.0942 },
-    { name: "DHA Phase 2, Islamabad", lat: 33.5297, lng: 73.0994 },
-    { name: "Centaurus Mall, Islamabad", lat: 33.7070, lng: 73.0522 },
-    { name: "Jinnah Super, Islamabad", lat: 33.7131, lng: 73.0739 },
-    { name: "Faisal Mosque, Islamabad", lat: 33.7296, lng: 73.0372 },
-    { name: "Pakistan Monument, Islamabad", lat: 33.6932, lng: 73.0689 },
-    { name: "Rawalpindi Railway Station", lat: 33.5997, lng: 73.0441 },
-    { name: "Commercial Market, Rawalpindi", lat: 33.5886, lng: 73.0656 },
-    { name: "Raja Bazaar, Rawalpindi", lat: 33.6003, lng: 73.0604 },
-    { name: "Faizabad, Rawalpindi", lat: 33.6603, lng: 73.0758 },
-    { name: "Melody Market, Islamabad", lat: 33.7078, lng: 73.0514 },
-    { name: "Super Market, Islamabad", lat: 33.7163, lng: 73.0642 },
-    { name: "Aabpara Market, Islamabad", lat: 33.7111, lng: 73.0842 },
-    { name: "Safa Gold Mall, Islamabad", lat: 33.7180, lng: 73.0491 },
-    { name: "Giga Mall, Islamabad", lat: 33.5167, lng: 73.1000 },
-  ], []);
+  const [autocompleteService, setAutocompleteService] = useState<google.maps.places.AutocompleteService | null>(null);
+  const [placesService, setPlacesService] = useState<google.maps.places.PlacesService | null>(null);
 
   // Load pre-bookings from localStorage once
   useEffect(() => {
@@ -152,27 +235,48 @@ export function SmartParkingMap({
   );
 
   const predictions = useMemo<LotPrediction[]>(() => {
-    const now = new Date();
-    const hourFactor = Math.cos((now.getHours() / 24) * Math.PI * 2); // -1..1
-    const dayFactor = now.getDay() === 0 || now.getDay() === 6 ? 0.15 : 0;
-
-    return parkingLots.map((lot, index) => {
-      const capacityScore = Math.min(1, lot.capacity / 150);
-      const baseScore = 0.5 + capacityScore * 0.3 - dayFactor;
-      const timeInfluence = hourFactor * 0.15;
-      const mlShake = ((index + mlSimulationTick) % 7) * 0.01; // placeholder for ML signal
-      const probability = Math.min(0.97, Math.max(0.08, baseScore - timeInfluence + mlShake));
-      const dynamicPrice = Math.max(50, Math.round(lot.base_price * (1 + (0.6 - probability) * 0.35)));
-      let confidenceLabel = "Balanced";
-      if (probability >= 0.75) confidenceLabel = "High chance";
-      else if (probability <= 0.35) confidenceLabel = "Tight";
-
-      return {
-        lotId: lot.id,
-        probability,
-        confidenceLabel,
-        dynamicPrice,
-      } satisfies LotPrediction;
+    return parkingLots.map((lot) => {
+      // Check if we have real-time data
+      const hasRealTimeData = lot.total_spots !== undefined && 
+                              lot.available_spots !== undefined && 
+                              lot.occupied_spots !== undefined;
+      
+      if (hasRealTimeData) {
+        // Use real-time availability data
+        const totalSpots = lot.total_spots || 1;
+        const availableSpots = lot.available_spots || 0;
+        const probability = availableSpots / totalSpots;
+        
+        return {
+          lotId: lot.id,
+          probability,
+          confidenceLabel: "Real-Time",
+          dynamicPrice: lot.base_price, // Use base price for real-time data
+          source: 'real-time' as const,
+          lastUpdated: new Date(),
+        } satisfies LotPrediction;
+      } else {
+        // Use ML prediction (placeholder simulation)
+        // TODO: Call actual ML API here via fetchMLPrediction(lot)
+        const now = new Date();
+        const hourFactor = Math.cos((now.getHours() / 24) * Math.PI * 2);
+        const dayFactor = now.getDay() === 0 || now.getDay() === 6 ? 0.15 : 0;
+        const capacityScore = Math.min(1, lot.capacity / 150);
+        const baseScore = 0.5 + capacityScore * 0.3 - dayFactor;
+        const timeInfluence = hourFactor * 0.15;
+        const mlShake = (mlSimulationTick % 7) * 0.01;
+        const probability = Math.min(0.97, Math.max(0.08, baseScore - timeInfluence + mlShake));
+        
+        return {
+          lotId: lot.id,
+          probability,
+          confidenceLabel: probability >= 0.75 ? "High" : probability <= 0.35 ? "Low" : "Medium",
+          dynamicPrice: Math.max(50, Math.round(lot.base_price * (1 + (0.6 - probability) * 0.35))),
+          source: 'ml-prediction' as const,
+          lastUpdated: new Date(),
+          modelVersion: 'placeholder-v0.1',
+        } satisfies LotPrediction;
+      }
     });
   }, [parkingLots, mlSimulationTick]);
 
@@ -197,6 +301,23 @@ export function SmartParkingMap({
     });
 
     mapRef.current = map;
+    
+    // Initialize Google Places services
+    if (window.google && window.google.maps && window.google.maps.places) {
+      const autoService = new google.maps.places.AutocompleteService();
+      const placeService = new google.maps.places.PlacesService(map);
+      setAutocompleteService(autoService);
+      setPlacesService(placeService);
+      console.log("✅ Google Places API initialized successfully");
+      console.log("   - AutocompleteService:", !!autoService);
+      console.log("   - PlacesService:", !!placeService);
+    } else {
+      console.error("❌ Google Places API not available!");
+      console.log("   - window.google:", !!window.google);
+      console.log("   - window.google.maps:", !!(window.google && window.google.maps));
+      console.log("   - window.google.maps.places:", !!(window.google && window.google.maps && window.google.maps.places));
+    }
+    
     setIsMapReady(true);
     console.log("✅ Map initialized");
   }, [fallbackLocation, userLocation]);
@@ -265,33 +386,101 @@ export function SmartParkingMap({
     };
   }, [userLocation, isMapReady]);
 
-  // Custom search handler - filter popular locations based on query
+  // Google Places Autocomplete search handler
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
-    if (query.trim().length < 2) {
-      setSearchResults([]);
+    
+    if (query.trim().length < 3) {
+      setPlacePredictions([]);
       setShowSearchResults(false);
       return;
     }
 
-    const lowerQuery = query.toLowerCase();
-    const filtered = popularLocations.filter(loc => 
-      loc.name.toLowerCase().includes(lowerQuery)
-    ).slice(0, 6);
-    
-    setSearchResults(filtered);
-    setShowSearchResults(filtered.length > 0);
-  }, [popularLocations]);
+    if (!autocompleteService) {
+      console.warn("⚠️ Autocomplete service not initialized yet. Please wait for map to load.");
+      return;
+    }
 
-  const handleSelectLocation = useCallback((location: {name: string; lat: number; lng: number}) => {
-    if (!mapRef.current) return;
-    mapRef.current.panTo({ lat: location.lat, lng: location.lng });
-    mapRef.current.setZoom(15);
-    setSearchQuery(location.name);
-    setShowSearchResults(false);
-    setStatusMessage(`Showing: ${location.name}`);
-    setTimeout(() => setStatusMessage(null), 3000);
-  }, []);
+    console.log("🔍 Searching for:", query);
+
+    // Use Google Places Autocomplete API
+    try {
+      autocompleteService.getPlacePredictions(
+        {
+          input: query,
+          // Bias results towards Pakistan (can be changed or removed for worldwide search)
+          componentRestrictions: { country: 'pk' },
+          // Alternative: use location bias instead of restrictions
+          // location: new google.maps.LatLng(33.6844, 73.0479), // Islamabad
+          // radius: 50000, // 50km radius
+        },
+        (predictions, status) => {
+          console.log("📡 API Response - Status:", status);
+          console.log("📡 API Response - Predictions:", predictions?.length || 0);
+          
+          if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+            setPlacePredictions(predictions.slice(0, 6)); // Limit to 6 results
+            setShowSearchResults(true);
+            console.log("✅ Showing", predictions.length, "results");
+          } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+            setPlacePredictions([]);
+            setShowSearchResults(false);
+            console.log("ℹ️ No results found for:", query);
+          } else if (status === google.maps.places.PlacesServiceStatus.UNKNOWN_ERROR) {
+            console.error("❌ UNKNOWN_ERROR from Places API");
+            console.error("   This usually means:");
+            console.error("   1. Places API not enabled in Google Cloud Console");
+            console.error("   2. API key doesn't have Places API permission");
+            console.error("   3. Billing not enabled for your Google Cloud project");
+            console.error("   4. API quota exceeded");
+            console.error("   ");
+            console.error("   Action required:");
+            console.error("   → Go to: https://console.cloud.google.com/apis/library/places-backend.googleapis.com");
+            console.error("   → Enable 'Places API (New)'");
+            console.error("   → Check billing is enabled");
+            setErrorMessage("Places API error. Please check console for details.");
+            setTimeout(() => setErrorMessage(null), 5000);
+            setPlacePredictions([]);
+            setShowSearchResults(false);
+          } else {
+            setPlacePredictions([]);
+            setShowSearchResults(false);
+            console.log("❌ API Error. Status:", status);
+          }
+        }
+      );
+    } catch (error) {
+      console.error("❌ Exception while calling Places API:", error);
+      setErrorMessage("Search error. Please try again.");
+      setTimeout(() => setErrorMessage(null), 3000);
+    }
+  }, [autocompleteService]);
+
+  const handleSelectLocation = useCallback((prediction: google.maps.places.AutocompletePrediction) => {
+    if (!mapRef.current || !placesService) return;
+    
+    // Get place details to get coordinates
+    placesService.getDetails(
+      {
+        placeId: prediction.place_id,
+        fields: ['geometry', 'name', 'formatted_address'],
+      },
+      (place, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && place && place.geometry && place.geometry.location) {
+          const location = place.geometry.location;
+          mapRef.current?.panTo(location);
+          mapRef.current?.setZoom(15);
+          setSearchQuery(place.name || prediction.description);
+          setShowSearchResults(false);
+          setStatusMessage(`Showing: ${place.name || prediction.description}`);
+          setTimeout(() => setStatusMessage(null), 3000);
+        } else {
+          setErrorMessage("Could not find location details");
+          setTimeout(() => setErrorMessage(null), 3000);
+        }
+      }
+    );
+  }, [placesService]);
 
   // Close search results when clicking outside
   useEffect(() => {
@@ -366,8 +555,24 @@ export function SmartParkingMap({
 
     parkingLots.forEach((lot) => {
       const prediction = predictionLookup.get(lot.id);
-      const availability = prediction?.probability ?? 0.5;
-      const color = availability > 0.7 ? "#22c55e" : availability < 0.35 ? "#ef4444" : "#f97316";
+      
+      // Determine availability ratio based on data source
+      let availabilityRatio: number;
+      if (prediction?.source === 'real-time') {
+        // Real-time data: Calculate from actual spots
+        const totalSpots = lot.total_spots || lot.capacity || 1;
+        const availableSpots = lot.available_spots || 0;
+        availabilityRatio = availableSpots / totalSpots;
+      } else {
+        // ML prediction: Use probability
+        availabilityRatio = prediction?.probability ?? 0.5;
+      }
+      
+      // Color coding:
+      // Green: >50% available (plenty of spots)
+      // Orange: 20-50% available (moderate availability)
+      // Red: <20% available (nearly full)
+      const color = availabilityRatio > 0.5 ? "#22c55e" : availabilityRatio > 0.2 ? "#f97316" : "#ef4444";
 
       const marker = new google.maps.Marker({
         position: { lat: lot.lat, lng: lot.lng },
@@ -576,15 +781,15 @@ export function SmartParkingMap({
               ref={searchInputRef}
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              onFocus={() => searchQuery.length >= 2 && setShowSearchResults(searchResults.length > 0)}
-              placeholder="Search Islamabad, Rawalpindi..."
+              onFocus={() => searchQuery.length >= 3 && setShowSearchResults(placePredictions.length > 0)}
+              placeholder="Search any location..."
               className="w-full border-none bg-transparent text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none"
             />
             {searchQuery && (
               <button
                 onClick={() => {
                   setSearchQuery("");
-                  setSearchResults([]);
+                  setPlacePredictions([]);
                   setShowSearchResults(false);
                 }}
                 className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
@@ -594,19 +799,26 @@ export function SmartParkingMap({
             )}
           </div>
           
-          {/* Search results dropdown */}
-          {showSearchResults && searchResults.length > 0 && (
-            <div className="absolute left-0 right-0 top-full mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_40px_rgba(0,0,0,0.12)]">
-              {searchResults.map((result, index) => (
+          {/* Search results dropdown - Google Places predictions */}
+          {showSearchResults && placePredictions.length > 0 && (
+            <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_40px_rgba(0,0,0,0.12)]">
+              {placePredictions.map((prediction) => (
                 <button
-                  key={index}
-                  onClick={() => handleSelectLocation(result)}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-indigo-50 focus:bg-indigo-50 focus:outline-none"
+                  key={prediction.place_id}
+                  onClick={() => handleSelectLocation(prediction)}
+                  className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-indigo-50 focus:bg-indigo-50 focus:outline-none"
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 mt-0.5">
                     <MapPin className="h-4 w-4 text-indigo-600" />
                   </div>
-                  <span className="text-sm font-medium text-slate-700">{result.name}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-slate-700 truncate">
+                      {prediction.structured_formatting.main_text}
+                    </div>
+                    <div className="text-xs text-slate-500 truncate mt-0.5">
+                      {prediction.structured_formatting.secondary_text}
+                    </div>
+                  </div>
                 </button>
               ))}
             </div>
@@ -740,12 +952,40 @@ export function SmartParkingMap({
                 <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-emerald-50 to-green-50 p-3 transition-all duration-200 hover:shadow-md sm:p-4">
                   <div className="absolute -right-2 -top-2 h-12 w-12 rounded-full bg-emerald-200/30" />
                   <p className="relative flex items-center gap-1.5 text-xs font-medium text-emerald-700">
-                    <span className="hidden sm:inline">Availability</span>
-                    <span className="sm:hidden">Avail</span>
+                    {predictionLookup.get(selectedLot.id)?.source === 'real-time' ? (
+                      <>
+                        <span className="hidden sm:inline">Available</span>
+                        <span className="sm:hidden">Avail</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="hidden sm:inline">ML Prediction</span>
+                        <span className="sm:hidden">Predict</span>
+                      </>
+                    )}
                   </p>
                   <p className="relative mt-1 text-xl font-bold text-emerald-900 sm:text-2xl">
-                    {((predictionLookup.get(selectedLot.id)?.probability ?? 0.5) * 100).toFixed(0)}%
+                    {predictionLookup.get(selectedLot.id)?.source === 'real-time' ? (
+                      // Real-time data: Show "7/8" format
+                      <>{selectedLot.available_spots}/{selectedLot.total_spots}</>
+                    ) : (
+                      // ML prediction: Show "73%" format
+                      <>{((predictionLookup.get(selectedLot.id)?.probability ?? 0.5) * 100).toFixed(0)}%</>
+                    )}
                   </p>
+                  {/* Data source badge */}
+                  <div className={`relative mt-1.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                    predictionLookup.get(selectedLot.id)?.source === 'real-time' 
+                      ? 'bg-emerald-200 text-emerald-800' 
+                      : 'bg-purple-200 text-purple-800'
+                  }`}>
+                    <div className={`h-1.5 w-1.5 rounded-full ${
+                      predictionLookup.get(selectedLot.id)?.source === 'real-time' 
+                        ? 'bg-emerald-600 animate-pulse' 
+                        : 'bg-purple-600'
+                    }`} />
+                    {predictionLookup.get(selectedLot.id)?.source === 'real-time' ? 'LIVE' : 'AI'}
+                  </div>
                 </div>
                 <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-50 to-indigo-50 p-3 transition-all duration-200 hover:shadow-md sm:p-4">
                   <div className="absolute -right-2 -top-2 h-12 w-12 rounded-full bg-blue-200/30" />

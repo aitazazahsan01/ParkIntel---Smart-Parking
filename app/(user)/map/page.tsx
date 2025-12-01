@@ -84,23 +84,76 @@ export default function MapPage() {
     init();
   }, [authChecked]);
 
-  // Fetch parking lots
+  // Fetch parking lots with availability
   useEffect(() => {
     if (!authChecked) return;
     
     const fetchParkingLots = async () => {
       try {
-        const { data, error } = await supabase
+        const { data: lotsData, error: lotsError } = await supabase
           .from("ParkingLots")
           .select("*")
           .order("id", { ascending: true });
 
-        if (data) {
-          console.log("✅ Fetched", data.length, "parking lots");
-          setParkingLots(data);
+        if (lotsError) {
+          console.error("❌ Error fetching parking lots:", lotsError);
+          setLoading(false);
+          return;
         }
-        if (error) {
-          console.error("❌ Error fetching parking lots:", error);
+
+        if (lotsData) {
+          console.log("✅ Fetched", lotsData.length, "parking lots");
+          
+          // Fetch parking spots to calculate availability
+          const lotsWithAvailability = await Promise.all(
+            lotsData.map(async (lot) => {
+              const { data: spotsData } = await supabase
+                .from("parking_spots")
+                .select("is_occupied")
+                .eq("lot_id", lot.id);
+              
+              // Check if this lot has real-time tracking
+              const hasRealTimeTracking = spotsData && spotsData.length > 0;
+              
+              if (hasRealTimeTracking) {
+                // This lot HAS parking_spots entries - use real-time data
+                const totalSpots = lot.total_spots || 0;
+                const occupiedSpots = spotsData.filter(spot => spot.is_occupied === true).length;
+                const availableSpots = totalSpots - occupiedSpots;
+                
+                return {
+                  id: lot.id,
+                  name: lot.name,
+                  address: lot.address,
+                  lat: lot.lat,
+                  lng: lot.lng,
+                  capacity: lot.total_spots,
+                  base_price: lot.price_per_hour,
+                  owner_id: lot.owner_id,
+                  // Real-time availability data
+                  total_spots: totalSpots,
+                  available_spots: availableSpots,
+                  occupied_spots: occupiedSpots,
+                } as ParkingLot;
+              } else {
+                // This lot has NO parking_spots entries - use ML prediction
+                return {
+                  id: lot.id,
+                  name: lot.name,
+                  address: lot.address,
+                  lat: lot.lat,
+                  lng: lot.lng,
+                  capacity: lot.total_spots,
+                  base_price: lot.price_per_hour,
+                  owner_id: lot.owner_id,
+                  // No real-time data - leave undefined for ML prediction
+                  // total_spots, available_spots, occupied_spots intentionally omitted
+                } as ParkingLot;
+              }
+            })
+          );
+          
+          setParkingLots(lotsWithAvailability);
         }
       } catch (err) {
         console.error("Unexpected error:", err);

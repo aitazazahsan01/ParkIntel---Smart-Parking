@@ -298,22 +298,47 @@ export default function OwnerDashboard() {
       }
 
       if (data) {
-        // Fetch occupied spots count for each lot
-        const lotsWithOccupancy = await Promise.all(
+        // Fetch occupied spots count and monthly revenue for each lot
+        const lotsWithData = await Promise.all(
           data.map(async (lot) => {
-            const { count } = await supabase
+            // Get occupied spots count
+            const { count: occupiedCount } = await supabase
               .from("parking_spots")
               .select("*", { count: "exact", head: true })
               .eq("lot_id", lot.id)
               .eq("is_occupied", true);
             
-            // Use total_spots if available, fallback to capacity for backward compatibility
-            const totalSpots = (lot as { total_spots?: number; capacity: number }).total_spots || lot.capacity || 0;
-            const occupancyRate = totalSpots > 0 ? Math.round((count || 0) / totalSpots * 100) : 0;
-            return { ...lot, occupancy: occupancyRate, total_spots: totalSpots };
+            // Calculate start of current month
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+            
+            // Fetch monthly revenue from completed parking sessions
+            const { data: sessions } = await supabase
+              .from("parking_sessions")
+              .select("fee_charged")
+              .eq("lot_id", lot.id)
+              .eq("status", "completed")
+              .gte("check_out_time", startOfMonth.toISOString());
+            
+            // Sum up all fees from completed sessions this month
+            const monthlyRevenue = sessions?.reduce((sum, session) => {
+              return sum + (Number(session.fee_charged) || 0);
+            }, 0) || 0;
+            
+            // Use total_spots from the table
+            const totalSpots = lot.total_spots || 0;
+            const occupancyRate = totalSpots > 0 ? Math.round(((occupiedCount || 0) / totalSpots) * 100) : 0;
+            
+            return { 
+              ...lot, 
+              occupancy: occupancyRate, 
+              total_spots: totalSpots,
+              revenue: monthlyRevenue,
+              occupied_spots: occupiedCount || 0
+            };
           })
         );
-        setLots(lotsWithOccupancy);
+        setLots(lotsWithData);
       }
       setLoading(false);
     };
@@ -323,6 +348,8 @@ export default function OwnerDashboard() {
 
   const totalCapacity = lots.reduce((acc, lot) => acc + (lot.total_spots || 0), 0);
   const totalRevenue = lots.reduce((acc, lot) => acc + (lot.revenue || 0), 0);
+  const totalOccupiedSpots = lots.reduce((acc, lot) => acc + (lot.occupied_spots || 0), 0);
+  const averageOccupancy = totalCapacity > 0 ? Math.round((totalOccupiedSpots / totalCapacity) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/30 to-slate-50">
@@ -410,7 +437,7 @@ export default function OwnerDashboard() {
               </div>
             </div>
             <div className="text-sm text-slate-500 font-medium">Occupancy Rate</div>
-            <div className="text-3xl font-bold text-slate-900 mt-1">73%</div>
+            <div className="text-3xl font-bold text-slate-900 mt-1">{averageOccupancy}%</div>
           </div>
         </div>
 
