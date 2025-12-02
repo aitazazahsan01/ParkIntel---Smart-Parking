@@ -174,6 +174,13 @@ export default function ParkingPage() {
   const mapRef = useRef<google.maps.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   
+  // Search states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [placePredictions, setPlacePredictions] = useState<google.maps.places.AutocompletePrediction[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [autocompleteService, setAutocompleteService] = useState<google.maps.places.AutocompleteService | null>(null);
+  const [placesService, setPlacesService] = useState<google.maps.places.PlacesService | null>(null);
+  
   const canvasRef = useRef<HTMLDivElement>(null);
   const isResizing = useRef(false);
 
@@ -321,6 +328,20 @@ export default function ParkingPage() {
     document.addEventListener('mouseup', stopDrag);
   };
 
+  // Close search results when clicking outside
+  useEffect(() => {
+    if (!showMapModal) return;
+    
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.search-container')) {
+        setShowSearchResults(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showMapModal]);
+  
   // Initialize Google Maps
   useEffect(() => {
     if (!showMapModal || !mapContainerRef.current) return;
@@ -339,6 +360,15 @@ export default function ParkingPage() {
       });
       
       mapRef.current = map;
+      
+      // Initialize Google Places services
+      if (window.google && window.google.maps && window.google.maps.places) {
+        const autoService = new google.maps.places.AutocompleteService();
+        const placeService = new google.maps.places.PlacesService(map);
+        setAutocompleteService(autoService);
+        setPlacesService(placeService);
+        console.log("✅ Google Places API initialized for register-lot page");
+      }
       
       // Add click listener to map
       map.addListener('click', (e: google.maps.MapMouseEvent) => {
@@ -440,6 +470,97 @@ export default function ParkingPage() {
     setShowMapModal(false);
     // Proceed to save
     handleSave();
+  };
+  
+  // Handle search input change with Google Places Autocomplete
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    
+    if (query.trim().length < 3) {
+      setPlacePredictions([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    if (!autocompleteService) {
+      console.warn("⚠️ Autocomplete service not initialized yet.");
+      return;
+    }
+
+    try {
+      autocompleteService.getPlacePredictions(
+        {
+          input: query,
+          componentRestrictions: { country: 'pk' },
+        },
+        (predictions, status) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+            setPlacePredictions(predictions.slice(0, 6));
+            setShowSearchResults(true);
+          } else {
+            setPlacePredictions([]);
+            setShowSearchResults(false);
+          }
+        }
+      );
+    } catch (error) {
+      console.error("❌ Exception while calling Places API:", error);
+    }
+  };
+  
+  // Handle location selection from search results
+  const handleSelectSearchLocation = (prediction: google.maps.places.AutocompletePrediction) => {
+    if (!mapRef.current || !placesService) return;
+    
+    placesService.getDetails(
+      {
+        placeId: prediction.place_id,
+        fields: ['geometry', 'name', 'formatted_address'],
+      },
+      (place, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && place && place.geometry && place.geometry.location) {
+          const location = place.geometry.location;
+          const lat = location.lat();
+          const lng = location.lng();
+          
+          // Update map position
+          mapRef.current?.panTo(location);
+          mapRef.current?.setZoom(17);
+          
+          // Remove old marker if exists
+          if (mapMarkerRef.current) {
+            mapMarkerRef.current.setMap(null);
+          }
+          
+          // Create new marker at searched location
+          const newMarker = new google.maps.Marker({
+            position: { lat, lng },
+            map: mapRef.current!,
+            draggable: true,
+            animation: google.maps.Animation.DROP,
+          });
+          
+          mapMarkerRef.current = newMarker;
+          setSelectedLocation({ lat, lng });
+          
+          // Update location when marker is dragged
+          newMarker.addListener('dragend', () => {
+            const pos = newMarker.getPosition();
+            if (pos) {
+              setSelectedLocation({ lat: pos.lat(), lng: pos.lng() });
+            }
+          });
+          
+          // Update address if available
+          if (place.formatted_address) {
+            setLotAddress(place.formatted_address);
+          }
+          
+          setSearchQuery(place.name || prediction.description);
+          setShowSearchResults(false);
+        }
+      }
+    );
   };
 
   // --- SUPABASE SAVING LOGIC ---
@@ -834,10 +955,10 @@ export default function ParkingPage() {
             {/* Modal Header */}
             <div className="absolute top-0 left-0 right-0 z-10 bg-white/95 backdrop-blur-sm border-b border-slate-200 px-6 py-4">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="flex-1">
                   <h2 className="text-xl font-bold text-slate-900">Select Parking Location</h2>
                   <p className="text-sm text-slate-500 mt-0.5">
-                    Click on the map to place your parking lot marker
+                    Search or click on the map to place your marker
                   </p>
                 </div>
                 <button
@@ -846,6 +967,61 @@ export default function ParkingPage() {
                 >
                   <span className="text-xl">×</span>
                 </button>
+              </div>
+              
+              {/* Search Bar */}
+              <div className="relative mt-4 search-container">
+                <div className="relative">
+                  <div className="group flex items-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-2.5 shadow-sm transition-all duration-300 hover:shadow-md focus-within:ring-2 focus-within:ring-indigo-500/30 focus-within:border-indigo-400">
+                    <svg className="h-5 w-5 shrink-0 text-slate-400 transition-colors group-focus-within:text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input
+                      value={searchQuery}
+                      onChange={(e) => handleSearchChange(e.target.value)}
+                      onFocus={() => searchQuery.length >= 3 && setShowSearchResults(placePredictions.length > 0)}
+                      placeholder="Search for a location (e.g., Bahria Town, Islamabad)..."
+                      className="w-full border-none bg-transparent text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => {
+                          setSearchQuery("");
+                          setPlacePredictions([]);
+                          setShowSearchResults(false);
+                        }}
+                        className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
+                      >
+                        <span className="text-xs">×</span>
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Search Results Dropdown */}
+                  {showSearchResults && placePredictions.length > 0 && (
+                    <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-80 overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-lg">
+                      {placePredictions.map((prediction) => (
+                        <button
+                          key={prediction.place_id}
+                          onClick={() => handleSelectSearchLocation(prediction)}
+                          className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-indigo-50 focus:bg-indigo-50 focus:outline-none"
+                        >
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 mt-0.5">
+                            <MapPin className="h-4 w-4 text-indigo-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-slate-700 truncate">
+                              {prediction.structured_formatting.main_text}
+                            </div>
+                            <div className="text-xs text-slate-500 truncate mt-0.5">
+                              {prediction.structured_formatting.secondary_text}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
               
               {selectedLocation && (
@@ -859,7 +1035,7 @@ export default function ParkingPage() {
             </div>
 
             {/* Map Container */}
-            <div ref={mapContainerRef} className="w-full h-full pt-28 pb-20"></div>
+            <div ref={mapContainerRef} className="w-full h-full pt-48 pb-20"></div>
 
             {/* Modal Footer */}
             <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 px-6 py-4">

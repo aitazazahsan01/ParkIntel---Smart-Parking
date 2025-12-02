@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { LogOut, Loader2 } from "lucide-react";
+import { LogOut, Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SmartParkingMap, type ParkingLot } from "@/components/google-map";
 
@@ -189,6 +189,15 @@ export default function MapPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push("/dashboard")}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">Dashboard</span>
+          </Button>
           <Button
             variant="outline"
             size="sm"
