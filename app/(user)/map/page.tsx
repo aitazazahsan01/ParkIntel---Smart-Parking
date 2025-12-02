@@ -112,6 +112,14 @@ export default function MapPage() {
                 .select("is_occupied")
                 .eq("lot_id", lot.id);
               
+              // Fetch active pre-bookings (reserved spots)
+              const { data: preBookingsData } = await supabase
+                .from("pre_bookings")
+                .select("id")
+                .eq("lot_id", lot.id)
+                .eq("status", "active")
+                .gt("expires_at", new Date().toISOString());
+              
               // Check if this lot has real-time tracking
               const hasRealTimeTracking = spotsData && spotsData.length > 0;
               
@@ -119,7 +127,9 @@ export default function MapPage() {
                 // This lot HAS parking_spots entries - use real-time data
                 const totalSpots = lot.total_spots || 0;
                 const occupiedSpots = spotsData.filter(spot => spot.is_occupied === true).length;
-                const availableSpots = totalSpots - occupiedSpots;
+                const reservedSpots = preBookingsData?.length || 0;
+                // Formula: Available = Total - Occupied - Reserved
+                const availableSpots = totalSpots - occupiedSpots - reservedSpots;
                 
                 return {
                   id: lot.id,
@@ -132,7 +142,7 @@ export default function MapPage() {
                   owner_id: lot.owner_id,
                   // Real-time availability data
                   total_spots: totalSpots,
-                  available_spots: availableSpots,
+                  available_spots: Math.max(0, availableSpots), // Ensure non-negative
                   occupied_spots: occupiedSpots,
                 } as ParkingLot;
               } else {
@@ -162,7 +172,17 @@ export default function MapPage() {
       }
     };
 
+    // Initial fetch
     fetchParkingLots();
+    
+    // Set up auto-refresh every 20 seconds
+    const intervalId = setInterval(() => {
+      console.log("🔄 Auto-refreshing parking data...");
+      fetchParkingLots();
+    }, 20000); // 20 seconds
+
+    // Cleanup interval on unmount
+    return () => clearInterval(intervalId);
   }, [authChecked]);
 
   // Show loading screen while checking authentication
