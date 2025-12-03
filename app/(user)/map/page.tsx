@@ -254,7 +254,7 @@ export default function MapPage() {
   }
 
   return (
-    <div className="relative h-screen flex flex-col bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/20 dark:from-slate-950 dark:via-indigo-950/20 dark:to-purple-950/10 overflow-hidden">
+    <div className="relative flex flex-col bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/20 dark:from-slate-950 dark:via-indigo-950/20 dark:to-purple-950/10" style={{ height: 'calc(100vh - 4rem)' }}>
       {/* Animated background elements */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-400/10 dark:bg-indigo-600/10 rounded-full blur-3xl animate-blob" />
@@ -262,7 +262,7 @@ export default function MapPage() {
       </div>
       
       {/* Enhanced Header with Gradient */}
-      <div className="relative flex items-center justify-between border-b border-slate-200/80 dark:border-slate-700/50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-4 py-3 shadow-lg shadow-slate-200/50 dark:shadow-slate-950/50 z-10 sm:px-6 sm:py-4">
+      <div className="relative flex shrink-0 items-center justify-between border-b border-slate-200/80 dark:border-slate-700/50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-4 py-3 shadow-lg shadow-slate-200/50 dark:shadow-slate-950/50 z-20 sm:px-6 sm:py-4">
         {/* Gradient accent line */}
         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-50" />
         
@@ -341,7 +341,7 @@ export default function MapPage() {
       </div>
 
       {/* Map Container with enhanced loading */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative overflow-hidden">
         {loading || !userLocation ? (
           <div className="flex items-center justify-center h-full bg-gradient-to-br from-slate-100 via-indigo-50/30 to-purple-50/20 dark:from-slate-900 dark:via-indigo-950/30 dark:to-purple-950/20 relative overflow-hidden">
             {/* Animated background orbs */}

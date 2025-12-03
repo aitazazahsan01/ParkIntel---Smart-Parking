@@ -963,7 +963,7 @@ export function SmartParkingMap({
 
       {/* Selected lot card - premium floating design */}
       {selectedLot && (
-        <div className="pointer-events-auto absolute bottom-4 left-4 right-4 z-10 max-h-[calc(100vh-8rem)] animate-in fade-in slide-in-from-bottom-4 duration-300 sm:bottom-6 sm:left-1/2 sm:right-auto sm:w-[440px] sm:-translate-x-1/2 lg:w-[480px]">
+        <div className="pointer-events-auto absolute bottom-23 left-4 right-4 z-10 max-h-[70vh] animate-in fade-in slide-in-from-bottom-4 duration-300 sm:bottom-23 sm:left-1/2 sm:right-auto sm:w-[440px] sm:-translate-x-1/2 lg:w-[480px]">
           <div className="flex max-h-full flex-col overflow-hidden rounded-3xl border border-white/20 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.15)] backdrop-blur-xl">
             {/* Gradient header accent */}
             <div className="h-1.5 shrink-0 bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500" />
@@ -976,31 +976,31 @@ export function SmartParkingMap({
               <X className="h-4 w-4" />
             </button>
 
-            <div className="overflow-y-auto p-5 sm:p-6">
+            <div className="overflow-y-auto overscroll-contain p-4 sm:p-5">
               {/* Header with availability indicator */}
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-2.5">
                 <div className={clsx(
-                  "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl",
+                  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:h-12 sm:w-12 sm:rounded-2xl",
                   (predictionLookup.get(selectedLot.id)?.probability ?? 0.5) > 0.7
                     ? "bg-emerald-100 text-emerald-600"
                     : (predictionLookup.get(selectedLot.id)?.probability ?? 0.5) > 0.35
                     ? "bg-amber-100 text-amber-600"
                     : "bg-red-100 text-red-600"
                 )}>
-                  <Car className="h-6 w-6" />
+                  <Car className="h-5 w-5 sm:h-6 sm:w-6" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h2 className="truncate text-lg font-bold text-slate-900 sm:text-xl">{selectedLot.name ?? "Parking Lot"}</h2>
-                  <p className="mt-0.5 flex items-center gap-1.5 text-sm text-slate-500">
-                    <MapPin className="h-3.5 w-3.5 shrink-0" />
+                  <h2 className="truncate text-base font-bold text-slate-900 sm:text-lg">{selectedLot.name ?? "Parking Lot"}</h2>
+                  <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500 sm:text-sm">
+                    <MapPin className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
                     <span className="truncate">{selectedLot.address ?? "Address not provided"}</span>
                   </p>
                 </div>
               </div>
 
               {/* Stats grid */}
-              <div className="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
-                <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-emerald-50 to-green-50 p-3 transition-all duration-200 hover:shadow-md sm:p-4">
+              <div className="mt-3 grid grid-cols-3 gap-2 sm:mt-4 sm:gap-2.5">
+                <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-emerald-50 to-green-50 p-2.5 transition-all duration-200 hover:shadow-md sm:p-3">
                   <div className="absolute -right-2 -top-2 h-12 w-12 rounded-full bg-emerald-200/30" />
                   <p className="relative flex items-center gap-1.5 text-xs font-medium text-emerald-700">
                     {predictionLookup.get(selectedLot.id)?.source === 'real-time' ? (
@@ -1038,7 +1038,7 @@ export function SmartParkingMap({
                     {predictionLookup.get(selectedLot.id)?.source === 'real-time' ? 'LIVE' : 'AI'}
                   </div>
                 </div>
-                <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-50 to-indigo-50 p-3 transition-all duration-200 hover:shadow-md sm:p-4">
+                <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-50 to-indigo-50 p-2.5 transition-all duration-200 hover:shadow-md sm:p-3">
                   <div className="absolute -right-2 -top-2 h-12 w-12 rounded-full bg-blue-200/30" />
                   <p className="relative flex items-center gap-1.5 text-xs font-medium text-blue-700">
                     <Clock className="h-3 w-3" />
@@ -1046,7 +1046,7 @@ export function SmartParkingMap({
                   </p>
                   <p className="relative mt-1 text-xl font-bold text-blue-900 sm:text-2xl">{travelEstimate?.durationText ?? "--"}</p>
                 </div>
-                <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-amber-50 to-orange-50 p-3 transition-all duration-200 hover:shadow-md sm:p-4">
+                <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-amber-50 to-orange-50 p-2.5 transition-all duration-200 hover:shadow-md sm:p-3">
                   <div className="absolute -right-2 -top-2 h-12 w-12 rounded-full bg-amber-200/30" />
                   <p className="relative flex items-center gap-1.5 text-xs font-medium text-amber-700">
                     <Banknote className="h-3 w-3" />
@@ -1059,18 +1059,18 @@ export function SmartParkingMap({
               </div>
 
               {/* Action buttons */}
-              <div className="mt-5 flex gap-3">
+              <div className="mt-3 flex gap-2.5 sm:mt-4 sm:gap-3">
                 <Button 
                   onClick={navigateToLot} 
                   variant="outline" 
-                  className="flex-1 gap-2 rounded-xl border-slate-200 py-2.5 text-slate-700 transition-all hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
+                  className="flex-1 gap-2 rounded-xl border-slate-200 py-2.5 text-sm text-slate-700 transition-all hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
                 >
                   <Navigation2 className="h-4 w-4" />
                   Navigate
                 </Button>
                 <Button 
                   onClick={() => setShowBookingModal(true)} 
-                  className="flex-1 gap-2 rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 py-2.5 text-white transition-all hover:from-indigo-700 hover:to-purple-700 hover:shadow-lg hover:shadow-indigo-500/25"
+                  className="flex-1 gap-2 rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 py-2.5 text-sm text-white transition-all hover:from-indigo-700 hover:to-purple-700 hover:shadow-lg hover:shadow-indigo-500/25"
                 >
                   <ShieldCheck className="h-4 w-4" />
                   Reserve Spot
@@ -1083,10 +1083,10 @@ export function SmartParkingMap({
 
       {/* Pre-booking modal - premium design */}
       {showBookingModal && selectedLot && (
-        <div className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative m-4 w-full max-w-md overflow-hidden rounded-3xl border border-white/20 bg-white shadow-[0_25px_80px_rgba(0,0,0,0.25)] animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+        <div className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200 p-6 py-12">
+          <div className="relative w-full max-w-md max-h-[85vh] overflow-hidden rounded-3xl border border-white/20 bg-white shadow-[0_25px_80px_rgba(0,0,0,0.25)] animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 flex flex-col">
             {/* Gradient header */}
-            <div className="relative bg-linear-to-r from-indigo-600 via-purple-600 to-pink-500 px-6 pb-8 pt-6">
+            <div className="relative shrink-0 bg-linear-to-r from-indigo-600 via-purple-600 to-pink-500 px-5 pb-6 pt-5">
               <button
                 onClick={() => {
                   setShowBookingModal(false);
@@ -1099,22 +1099,22 @@ export function SmartParkingMap({
               </button>
               
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
+                <div className="flex h-13 w-13 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
                   <ShieldCheck className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white">Reserve Your Spot</h3>
-                  <p className="text-sm text-white/80">{selectedLot.name ?? "Parking Lot"}</p>
+                  <p className="text-sm text-white/90">{selectedLot.name ?? "Parking Lot"}</p>
                 </div>
               </div>
             </div>
 
             {/* Form content */}
-            <div className="px-6 pb-6 pt-5">
-              <div className="space-y-4">
+            <div className="overflow-y-auto px-5 pb-6 pt-4">
+              <div className="space-y-3">
                 {/* Plate input */}
                 <div>
-                  <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
+                  <label className="mb-1.5 flex items-center gap-2 text-sm font-semibold text-slate-700">
                     <Car className="h-4 w-4 text-slate-500" />
                     Vehicle Plate Number
                   </label>
@@ -1122,14 +1122,14 @@ export function SmartParkingMap({
                     value={plateInput}
                     onChange={(event) => setPlateInput(event.target.value)}
                     placeholder="ABC-1234"
-                    className="w-full rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-center text-lg font-bold uppercase tracking-widest text-slate-900 transition-all duration-200 placeholder:font-normal placeholder:tracking-normal placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10"
+                    className="w-full rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3.5 text-center text-base font-bold uppercase tracking-widest text-slate-900 transition-all duration-200 placeholder:font-normal placeholder:tracking-normal placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10"
                   />
                 </div>
 
                 {/* Hold duration info */}
-                <div className="rounded-2xl border border-indigo-100 bg-linear-to-br from-indigo-50 to-purple-50 p-4">
+                <div className="rounded-xl border border-indigo-100 bg-linear-to-br from-indigo-50 to-purple-50 p-3">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-indigo-700">
+                    <div className="flex items-center gap-1.5 text-sm text-indigo-700">
                       <Clock className="h-4 w-4" />
                       <span className="font-medium">Hold Duration</span>
                     </div>
@@ -1137,13 +1137,13 @@ export function SmartParkingMap({
                       {travelEstimate ? `${Math.ceil(travelEstimate.durationValue / 60) * 2} min` : `40 min`}
                     </span>
                   </div>
-                  <p className="mt-2 text-xs text-indigo-600/80">
-                    Auto-calculated: 2× estimated travel time {travelEstimate && `(${travelEstimate.durationText} × 2)`}
+                  <p className="mt-2 text-xs text-indigo-600/80 leading-snug">
+                    Auto-calculated: 2× travel time {travelEstimate && `(${travelEstimate.durationText} × 2)`}
                   </p>
                 </div>
 
                 {/* Reservation fee info */}
-                <div className="rounded-2xl border border-amber-200 bg-linear-to-br from-amber-50 to-orange-50 p-4">
+                <div className="rounded-xl border border-amber-200 bg-linear-to-br from-amber-50 to-orange-50 p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-sm text-amber-700">
                       <Banknote className="h-4 w-4" />
@@ -1153,21 +1153,21 @@ export function SmartParkingMap({
                       Rs. {Math.round((predictionLookup.get(selectedLot.id)?.dynamicPrice ?? selectedLot.base_price) * 0.20)}
                     </span>
                   </div>
-                  <p className="mt-2 text-xs text-amber-600/80">
+                  <p className="mt-2 text-xs text-amber-600/80 leading-snug">
                     20% of hourly rate (Rs. {predictionLookup.get(selectedLot.id)?.dynamicPrice ?? selectedLot.base_price}/hr) - Charged now
                   </p>
                 </div>
 
                 {/* Policy info */}
-                <div className="rounded-2xl border border-amber-200 bg-linear-to-br from-amber-50 to-orange-50 p-4">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-200">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100">
                       <ShieldCheck className="h-4 w-4 text-amber-700" />
                     </div>
-                    <div className="text-xs text-amber-800">
+                    <div className="text-xs text-slate-700 leading-snug">
                       <p className="font-semibold">Booking Policy</p>
-                      <p className="mt-1 leading-relaxed">
-                        Maximum {MAX_BOOKINGS} active bookings allowed. Your reserved spot will auto-release if you don&apos;t arrive within the hold duration.
+                      <p className="mt-1">
+                        Max {MAX_BOOKINGS} active bookings. Spot auto-releases if you don&apos;t arrive in time.
                       </p>
                     </div>
                   </div>
@@ -1180,12 +1180,12 @@ export function SmartParkingMap({
                   handlePreBook();
                   setShowBookingModal(false);
                 }}
-                className="mt-6 w-full rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 py-3 text-base font-semibold text-white transition-all hover:from-indigo-700 hover:to-purple-700 hover:shadow-lg hover:shadow-indigo-500/25"
+                className="mt-6 w-full rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 py-4 text-base font-semibold text-white transition-all hover:from-indigo-700 hover:to-purple-700 hover:shadow-lg hover:shadow-indigo-500/25"
               >
                 Confirm Reservation
               </Button>
               
-              <p className="mt-3 text-center text-xs text-slate-500">
+              <p className="mt-3 mb-1 text-center text-xs text-slate-500">
                 By reserving, you agree to our booking terms
               </p>
             </div>
