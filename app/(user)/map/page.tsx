@@ -212,22 +212,55 @@ export default function MapPage() {
   // Show loading screen while checking authentication
   if (!authChecked) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/20 dark:from-slate-950 dark:via-indigo-950/30 dark:to-purple-950/20">
-        <div className="text-center">
-          <div className="relative mb-4">
-            <div className="absolute inset-0 blur-xl opacity-50">
-              <Loader2 className="h-12 w-12 animate-spin text-indigo-600 dark:text-indigo-400 mx-auto" />
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/20 dark:from-slate-950 dark:via-indigo-950/30 dark:to-purple-950/20 overflow-hidden">
+        {/* Animated background orbs */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-400/20 dark:bg-indigo-600/20 rounded-full blur-3xl animate-blob" />
+          <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-purple-400/20 dark:bg-purple-600/20 rounded-full blur-3xl animate-blob animation-delay-2000" />
+        </div>
+        
+        <div className="text-center relative z-10">
+          <div className="relative mb-8">
+            {/* Outer glow ring */}
+            <div className="absolute inset-0 blur-2xl opacity-40 animate-pulse">
+              <div className="h-20 w-20 mx-auto rounded-full bg-gradient-to-br from-indigo-500 to-purple-600" />
             </div>
-            <Loader2 className="relative h-12 w-12 animate-spin text-indigo-600 dark:text-indigo-400 mx-auto" />
+            {/* Main spinning loader */}
+            <div className="relative">
+              <Loader2 className="h-20 w-20 animate-spin text-indigo-600 dark:text-indigo-400 mx-auto" strokeWidth={2.5} />
+            </div>
+            {/* Center pulsing dot */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-4 w-4 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 animate-pulse" />
+            </div>
           </div>
-          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Preparing your parking experience...</p>
+          
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-900 via-indigo-900 to-purple-900 dark:from-slate-100 dark:via-indigo-300 dark:to-purple-300 bg-clip-text text-transparent mb-3">
+            Finding Your Perfect Spot
+          </h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400 font-medium mb-4">
+            Unlocking smart parking just for you ✨
+          </p>
+          
+          {/* Animated dots */}
+          <div className="flex items-center justify-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-indigo-600 dark:bg-indigo-400 animate-bounce [animation-delay:-0.3s]" />
+            <div className="h-2 w-2 rounded-full bg-indigo-600 dark:bg-indigo-400 animate-bounce [animation-delay:-0.15s]" />
+            <div className="h-2 w-2 rounded-full bg-indigo-600 dark:bg-indigo-400 animate-bounce" />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div className="relative h-screen flex flex-col bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/20 dark:from-slate-950 dark:via-indigo-950/20 dark:to-purple-950/10 overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-400/10 dark:bg-indigo-600/10 rounded-full blur-3xl animate-blob" />
+        <div className="absolute top-1/4 right-1/4 w-80 h-80 bg-purple-400/10 dark:bg-purple-600/10 rounded-full blur-3xl animate-blob animation-delay-2000" />
+      </div>
+      
       {/* Enhanced Header with Gradient */}
       <div className="relative flex items-center justify-between border-b border-slate-200/80 dark:border-slate-700/50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl px-4 py-3 shadow-lg shadow-slate-200/50 dark:shadow-slate-950/50 z-10 sm:px-6 sm:py-4">
         {/* Gradient accent line */}
@@ -310,30 +343,60 @@ export default function MapPage() {
       {/* Map Container with enhanced loading */}
       <div className="flex-1 relative">
         {loading || !userLocation ? (
-          <div className="flex items-center justify-center h-full bg-gradient-to-br from-slate-100 via-indigo-50/30 to-purple-50/20 dark:from-slate-900 dark:via-indigo-950/30 dark:to-purple-950/20">
-            <div className="text-center">
-              <div className="relative mb-6">
-                {/* Outer rotating ring */}
-                <div className="absolute inset-0 blur-2xl opacity-40">
-                  <Loader2 className="h-16 w-16 animate-spin text-indigo-600 dark:text-indigo-400 mx-auto" />
+          <div className="flex items-center justify-center h-full bg-gradient-to-br from-slate-100 via-indigo-50/30 to-purple-50/20 dark:from-slate-900 dark:via-indigo-950/30 dark:to-purple-950/20 relative overflow-hidden">
+            {/* Animated background orbs */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-indigo-400/20 dark:bg-indigo-600/20 rounded-full blur-3xl animate-blob" />
+              <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-purple-400/20 dark:bg-purple-600/20 rounded-full blur-3xl animate-blob animation-delay-2000" />
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-pink-400/15 dark:bg-pink-600/15 rounded-full blur-3xl animate-blob animation-delay-4000" />
+            </div>
+            
+            <div className="text-center relative z-10">
+              <div className="relative mb-8">
+                {/* Outer glow ring */}
+                <div className="absolute inset-0 blur-3xl opacity-50 animate-pulse">
+                  <div className="h-24 w-24 mx-auto rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500" />
+                </div>
+                {/* Rotating gradient ring */}
+                <div className="absolute inset-0 animate-spin" style={{ animationDuration: '3s' }}>
+                  <div className="h-24 w-24 mx-auto rounded-full border-4 border-transparent border-t-indigo-600 border-r-purple-600 dark:border-t-indigo-400 dark:border-r-purple-400 opacity-50" />
                 </div>
                 {/* Main spinner */}
-                <Loader2 className="relative h-16 w-16 animate-spin text-indigo-600 dark:text-indigo-400 mx-auto" />
-                {/* Inner pulsing dot */}
+                <Loader2 className="relative h-24 w-24 animate-spin text-indigo-600 dark:text-indigo-400 mx-auto" strokeWidth={2} />
+                {/* Center pulsing gradient dot */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="h-3 w-3 rounded-full bg-indigo-600 dark:bg-indigo-400 animate-pulse" />
+                  <div className="h-6 w-6 rounded-full bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400 animate-pulse shadow-lg" />
                 </div>
               </div>
-              <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200 mb-1">
-                Loading Your Parking Map
+              
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-900 via-indigo-900 to-purple-900 dark:from-slate-100 dark:via-indigo-300 dark:to-purple-300 bg-clip-text text-transparent mb-3">
+                Discovering Your Parking Universe
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Finding the best spots near you...
+              <p className="text-base text-slate-600 dark:text-slate-400 font-medium mb-6 max-w-md mx-auto">
+                Scanning premium locations & calculating optimal routes 🚗✨
               </p>
-              <div className="mt-4 flex items-center justify-center gap-1">
-                <div className="h-1.5 w-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400 animate-bounce [animation-delay:-0.3s]" />
-                <div className="h-1.5 w-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400 animate-bounce [animation-delay:-0.15s]" />
-                <div className="h-1.5 w-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400 animate-bounce" />
+              
+              {/* Animated progress dots */}
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <div className="h-2.5 w-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 animate-bounce [animation-delay:-0.3s]" />
+                <div className="h-2.5 w-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 animate-bounce [animation-delay:-0.15s]" />
+                <div className="h-2.5 w-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 animate-bounce" />
+              </div>
+              
+              {/* Loading features list */}
+              <div className="flex items-center justify-center gap-6 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                <div className="flex items-center gap-1.5">
+                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Live Availability</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse [animation-delay:-0.3s]" />
+                  <span>Smart Pricing</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse [animation-delay:-0.6s]" />
+                  <span>Best Routes</span>
+                </div>
               </div>
             </div>
           </div>

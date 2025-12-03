@@ -248,14 +248,21 @@ export default function DriverDashboard() {
   const completedSessions = sessions.filter((s) => s.status === "completed").length;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-indigo-50/30 to-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/40 to-purple-50/30 dark:from-slate-950 dark:via-indigo-950/30 dark:to-purple-950/20 relative overflow-hidden">
+      {/* Animated background orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-400/10 dark:bg-indigo-600/10 rounded-full blur-3xl animate-blob" />
+        <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-purple-400/10 dark:bg-purple-600/10 rounded-full blur-3xl animate-blob animation-delay-2000" />
+      </div>
       {/* Header */}
-      <div className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
-        <div className="mx-auto max-w-7xl px-6 py-4">
+      <div className="relative border-b border-slate-200/80 dark:border-slate-700/50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl sticky top-0 z-10 shadow-lg shadow-slate-200/50 dark:shadow-slate-950/50">
+        {/* Gradient accent line */}
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-60" />
+        <div className="mx-auto max-w-7xl px-6 py-4 relative">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">My Parking History</h1>
-              <p className="text-sm text-slate-500 mt-1">Track your parking sessions and expenses</p>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 via-indigo-900 to-purple-900 dark:from-slate-100 dark:via-indigo-300 dark:to-purple-300 bg-clip-text text-transparent">Your Parking Journey</h1>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 font-medium">Every mile saved, every moment counted ✨</p>
             </div>
             <div className="flex items-center gap-3">
               <Button
@@ -293,41 +300,41 @@ export default function DriverDashboard() {
 
       <div className="mx-auto max-w-7xl px-6 py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 relative z-10">
+          <div className="group bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-lg hover:shadow-xl hover:border-emerald-400 dark:hover:border-emerald-500 transition-all duration-300 hover:scale-[1.02] backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500 font-medium">Total Spent</p>
-                <p className="text-3xl font-bold text-slate-900 mt-1">
+                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Total Spent</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-1">
                   Rs. {totalSpent.toFixed(0)}
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                <DollarSign className="h-6 w-6 text-emerald-600" />
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <DollarSign className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="group bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-lg hover:shadow-xl hover:border-indigo-400 dark:hover:border-indigo-500 transition-all duration-300 hover:scale-[1.02] backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500 font-medium">Active Sessions</p>
-                <p className="text-3xl font-bold text-slate-900 mt-1">{activeSessions}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Active Sessions</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-1">{activeSessions}</p>
               </div>
-              <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center">
-                <Clock className="h-6 w-6 text-indigo-600" />
+              <div className="w-12 h-12 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Clock className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="group bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-lg hover:shadow-xl hover:border-purple-400 dark:hover:border-purple-500 transition-all duration-300 hover:scale-[1.02] backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500 font-medium">Completed</p>
-                <p className="text-3xl font-bold text-slate-900 mt-1">{completedSessions}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Completed</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white mt-1">{completedSessions}</p>
               </div>
-              <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-purple-600" />
+              <div className="w-12 h-12 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <TrendingUp className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
             </div>
           </div>
@@ -432,37 +439,37 @@ export default function DriverDashboard() {
         )}
 
         {/* Filter Tabs */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="border-b border-slate-200 px-6 py-4">
+        <div className="relative z-10 bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg backdrop-blur-sm overflow-hidden">
+          <div className="border-b border-slate-200 dark:border-slate-700 px-6 py-4 bg-gradient-to-r from-slate-50/50 to-transparent dark:from-slate-800/50">
             <div className="flex items-center gap-4">
               <Filter className="h-5 w-5 text-slate-400" />
               <div className="flex gap-2">
                 <button
                   onClick={() => setFilter("all")}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                     filter === "all"
-                      ? "bg-indigo-600 text-white"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/30"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                   }`}
                 >
                   All Sessions
                 </button>
                 <button
                   onClick={() => setFilter("active")}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                     filter === "active"
-                      ? "bg-indigo-600 text-white"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/30"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                   }`}
                 >
                   Active
                 </button>
                 <button
                   onClick={() => setFilter("completed")}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                     filter === "completed"
-                      ? "bg-indigo-600 text-white"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/30"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                   }`}
                 >
                   Completed
@@ -494,56 +501,56 @@ export default function DriverDashboard() {
               </div>
             ) : (
               <table className="w-full">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                       Location
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                       Check In
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                       Check Out
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                       Duration
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                       Amount
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                       Status
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                   {filteredSessions.map((session) => (
-                    <tr key={session.id} className="hover:bg-slate-50 transition-colors">
+                    <tr key={session.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
-                            <MapPin className="h-5 w-5 text-indigo-600" />
+                          <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                            <MapPin className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                           </div>
                           <div>
-                            <div className="text-sm font-semibold text-slate-900">
+                            <div className="text-sm font-semibold text-slate-900 dark:text-white">
                               {session.location_name}
                             </div>
-                            <div className="text-xs text-slate-500">{session.address}</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">{session.address}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">
+                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
                         {new Date(session.check_in_time).toLocaleString()}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">
+                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
                         {session.check_out_time
                           ? new Date(session.check_out_time).toLocaleString()
                           : "-"}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">
+                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
                         {session.duration_minutes ? `${session.duration_minutes} mins` : "-"}
                       </td>
-                      <td className="px-6 py-4 text-sm font-semibold text-slate-900">
+                      <td className="px-6 py-4 text-sm font-semibold text-slate-900 dark:text-white">
                         {session.amount_paid ? `Rs. ${session.amount_paid}` : "-"}
                       </td>
                       <td className="px-6 py-4">

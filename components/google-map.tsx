@@ -963,20 +963,20 @@ export function SmartParkingMap({
 
       {/* Selected lot card - premium floating design */}
       {selectedLot && (
-        <div className="pointer-events-auto absolute bottom-4 left-4 right-4 z-10 animate-in fade-in slide-in-from-bottom-4 duration-300 sm:bottom-6 sm:left-1/2 sm:right-auto sm:w-[440px] sm:-translate-x-1/2 lg:w-[480px]">
-          <div className="overflow-hidden rounded-3xl border border-white/20 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.15)] backdrop-blur-xl">
+        <div className="pointer-events-auto absolute bottom-4 left-4 right-4 z-10 max-h-[calc(100vh-8rem)] animate-in fade-in slide-in-from-bottom-4 duration-300 sm:bottom-6 sm:left-1/2 sm:right-auto sm:w-[440px] sm:-translate-x-1/2 lg:w-[480px]">
+          <div className="flex max-h-full flex-col overflow-hidden rounded-3xl border border-white/20 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.15)] backdrop-blur-xl">
             {/* Gradient header accent */}
-            <div className="h-1.5 bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500" />
+            <div className="h-1.5 shrink-0 bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500" />
             
             {/* Close button */}
             <button
               onClick={() => setSelectedLotId(null)}
-              className="absolute right-4 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-all duration-200 hover:bg-slate-200 hover:text-slate-700"
+              className="absolute right-4 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-all duration-200 hover:bg-slate-200 hover:text-slate-700"
             >
               <X className="h-4 w-4" />
             </button>
 
-            <div className="p-5 sm:p-6">
+            <div className="overflow-y-auto p-5 sm:p-6">
               {/* Header with availability indicator */}
               <div className="flex items-start gap-3">
                 <div className={clsx(

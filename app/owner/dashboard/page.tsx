@@ -382,20 +382,28 @@ export default function OwnerDashboard() {
   const averageOccupancy = totalCapacity > 0 ? Math.round((totalOccupiedSpots / totalCapacity) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-purple-50/30 to-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/40 to-pink-50/30 dark:from-slate-950 dark:via-purple-950/30 dark:to-pink-950/20 relative overflow-hidden">
+      {/* Animated background orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-400/10 dark:bg-purple-600/10 rounded-full blur-3xl animate-blob" />
+        <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-pink-400/10 dark:bg-pink-600/10 rounded-full blur-3xl animate-blob animation-delay-2000" />
+        <div className="absolute bottom-1/4 left-1/2 w-72 h-72 bg-indigo-400/10 dark:bg-indigo-600/10 rounded-full blur-3xl animate-blob animation-delay-4000" />
+      </div>
       {/* Header */}
-      <div className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
-        <div className="mx-auto max-w-7xl px-6 py-4">
+      <div className="relative border-b border-slate-200/80 dark:border-slate-700/50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl sticky top-0 z-10 shadow-lg shadow-slate-200/50 dark:shadow-slate-950/50">
+        {/* Gradient accent line */}
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-60" />
+        <div className="mx-auto max-w-7xl px-6 py-4 relative">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">My Parking Business</h1>
-              <p className="text-sm text-slate-500 mt-1">Manage locations, pricing, and operators</p>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 via-purple-900 to-pink-900 dark:from-slate-100 dark:via-purple-300 dark:to-pink-300 bg-clip-text text-transparent">Your Parking Empire</h1>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 font-medium">Master your locations, pricing & team 🚀</p>
             </div>
             <div className="flex items-center gap-3">
               <Button
                 onClick={() => router.push("/owner/settings")}
                 variant="outline"
-                className="border-slate-300 text-slate-700 hover:bg-slate-50"
+                className="border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-500 font-medium transition-all"
               >
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
@@ -404,7 +412,7 @@ export default function OwnerDashboard() {
                 onClick={handleLogout}
                 disabled={loggingOut}
                 variant="outline"
-                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
+                className="border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 hover:text-red-700 dark:hover:text-red-300 hover:border-red-400 dark:hover:border-red-600 font-medium transition-all"
               >
                 {loggingOut ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -413,7 +421,7 @@ export default function OwnerDashboard() {
                 )}
                 {loggingOut ? "Logging out..." : "Logout"}
               </Button>
-              <Button asChild className="bg-purple-600 hover:bg-purple-700">
+              <Button asChild className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all">
                 <Link href="/owner/register-lot">
                   <>
                     <Plus className="mr-2 h-4 w-4" />
@@ -429,45 +437,65 @@ export default function OwnerDashboard() {
       {/* Main Content */}
       <div className="mx-auto max-w-7xl px-6 py-8">
         {/* Stats Grid */}
-        <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                <MapPin className="h-6 w-6 text-purple-600" />
+        <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-4 relative z-10">
+          {/* Total Locations Card */}
+          <div className="group relative rounded-2xl bg-gradient-to-br from-purple-600 via-purple-700 to-purple-900 dark:from-purple-800 dark:via-purple-900 dark:to-slate-900 p-6 shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 hover:scale-[1.03] overflow-hidden border border-purple-500/20">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-400/20 to-purple-600/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg border border-purple-400/30">
+                  <MapPin className="h-7 w-7 text-purple-300" />
+                </div>
               </div>
+              <div className="text-sm text-purple-200 font-semibold mb-2">Total Locations</div>
+              <div className="text-4xl font-extrabold text-white">{lots.length}</div>
             </div>
-            <div className="text-sm text-slate-500 font-medium">Total Locations</div>
-            <div className="text-3xl font-bold text-slate-900 mt-1">{lots.length}</div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center">
-                <Car className="h-6 w-6 text-indigo-600" />
+          {/* Total Capacity Card */}
+          <div className="group relative rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-700 to-indigo-900 dark:from-indigo-800 dark:via-indigo-900 dark:to-slate-900 p-6 shadow-2xl hover:shadow-indigo-500/30 transition-all duration-300 hover:scale-[1.03] overflow-hidden border border-indigo-500/20">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-400/20 to-indigo-600/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg border border-indigo-400/30">
+                  <Car className="h-7 w-7 text-indigo-300" />
+                </div>
               </div>
+              <div className="text-sm text-indigo-200 font-semibold mb-2">Total Capacity</div>
+              <div className="text-4xl font-extrabold text-white">{totalCapacity}</div>
             </div>
-            <div className="text-sm text-slate-500 font-medium">Total Capacity</div>
-            <div className="text-3xl font-bold text-slate-900 mt-1">{totalCapacity}</div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                <DollarSign className="h-6 w-6 text-emerald-600" />
+          {/* Monthly Revenue Card */}
+          <div className="group relative rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 dark:from-emerald-800 dark:via-emerald-900 dark:to-slate-900 p-6 shadow-2xl hover:shadow-emerald-500/30 transition-all duration-300 hover:scale-[1.03] overflow-hidden border border-emerald-500/20">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg border border-emerald-400/30">
+                  <DollarSign className="h-7 w-7 text-emerald-300" />
+                </div>
               </div>
+              <div className="text-sm text-emerald-200 font-semibold mb-2">Monthly Revenue</div>
+              <div className="text-4xl font-extrabold text-white">Rs. {totalRevenue.toFixed(0)}</div>
             </div>
-            <div className="text-sm text-slate-500 font-medium">Monthly Revenue</div>
-            <div className="text-3xl font-bold text-emerald-600 mt-1">Rs. {totalRevenue.toFixed(0)}</div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center">
-                <Activity className="h-6 w-6 text-orange-600" />
+          {/* Occupancy Rate Card */}
+          <div className="group relative rounded-2xl bg-gradient-to-br from-orange-600 via-orange-700 to-orange-900 dark:from-orange-800 dark:via-orange-900 dark:to-slate-900 p-6 shadow-2xl hover:shadow-orange-500/30 transition-all duration-300 hover:scale-[1.03] overflow-hidden border border-orange-500/20">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-400/20 to-orange-600/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg border border-orange-400/30">
+                  <Activity className="h-7 w-7 text-orange-300" />
+                </div>
               </div>
+              <div className="text-sm text-orange-200 font-semibold mb-2">Occupancy Rate</div>
+              <div className="text-4xl font-extrabold text-white">{averageOccupancy}%</div>
             </div>
-            <div className="text-sm text-slate-500 font-medium">Occupancy Rate</div>
-            <div className="text-3xl font-bold text-slate-900 mt-1">{averageOccupancy}%</div>
           </div>
         </div>
 
@@ -477,16 +505,16 @@ export default function OwnerDashboard() {
             <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
           </div>
         ) : lots.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="relative z-10 bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg backdrop-blur-sm overflow-hidden">
             <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-purple-100 text-purple-600">
+              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-lg">
                 <MapPin size={40} />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">No Parking Lots Yet</h3>
-              <p className="mb-8 max-w-md text-slate-500">
-                Start your parking business by registering your first location. Use our canvas tool to design spots or skip to enable predictions.
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-900 via-purple-900 to-pink-900 dark:from-slate-100 dark:via-purple-300 dark:to-pink-300 bg-clip-text text-transparent mb-2">No Parking Lots Yet</h3>
+              <p className="mb-8 max-w-md text-slate-600 dark:text-slate-400 font-medium">
+                Launch your parking empire! Register your first location and start earning 🎯
               </p>
-              <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white">
+              <Button asChild className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all">
                 <Link href="/owner/register-lot">
                   <>
                     <Plus className="mr-2 h-5 w-5" />
@@ -498,18 +526,27 @@ export default function OwnerDashboard() {
           </div>
         ) : (
           <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-slate-900">Your Parking Locations</h2>
-              <span className="text-sm text-slate-500">{lots.length} {lots.length === 1 ? 'location' : 'locations'}</span>
+            <div className="flex items-center justify-between mb-6 relative z-10">
+              <h2 className="text-xl font-bold bg-gradient-to-r from-slate-900 via-purple-900 to-pink-900 dark:from-slate-100 dark:via-purple-300 dark:to-pink-300 bg-clip-text text-transparent">Your Parking Locations</h2>
+              <span className="text-sm text-slate-600 dark:text-slate-400 font-medium px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800">{lots.length} {lots.length === 1 ? 'location' : 'locations'}</span>
             </div>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 relative z-10">
               {lots.map((lot) => (
-                <div key={lot.id} className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:border-purple-300 hover:shadow-lg">
+                <div key={lot.id} className="group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/80 shadow-lg transition-all hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-2xl hover:scale-[1.02] backdrop-blur-sm">
                   {/* Image/Banner */}
-                  <div className="h-40 w-full bg-linear-to-br from-purple-500 to-indigo-600 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+                  <div className="h-40 w-full bg-gradient-to-br from-violet-600 via-fuchsia-500 to-pink-500 dark:from-violet-700 dark:via-fuchsia-600 dark:to-pink-600 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30"></div>
+                    {/* Mesh gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/40 via-transparent to-blue-600/40"></div>
+                    {/* Animated shine effect */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 transform translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+                    </div>
+                    {/* Decorative circles */}
+                    <div className="absolute top-4 left-4 w-20 h-20 rounded-full bg-white/10 blur-2xl"></div>
+                    <div className="absolute bottom-4 right-8 w-24 h-24 rounded-full bg-purple-400/20 blur-2xl"></div>
                     <div className="absolute bottom-3 right-3">
-                      <span className="px-3 py-1 rounded-full bg-white/90 text-xs font-semibold text-purple-900">
+                      <span className="px-4 py-2 rounded-full bg-white/95 dark:bg-slate-900/95 text-xs font-bold text-purple-900 dark:text-purple-200 shadow-xl backdrop-blur-sm border border-white/50 dark:border-purple-500/50">
                         {lot.total_spots || 0} Spots
                       </span>
                     </div>
@@ -517,23 +554,23 @@ export default function OwnerDashboard() {
                   
                   {/* Content */}
                   <div className="p-6">
-                    <h3 className="mb-2 text-xl font-bold text-slate-900 group-hover:text-purple-600 transition-colors">
+                    <h3 className="mb-2 text-xl font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                       {lot.name}
                     </h3>
-                    <p className="mb-4 flex items-start text-sm text-slate-500">
-                      <MapPin size={16} className="mr-2 mt-0.5 shrink-0" />
+                    <p className="mb-4 flex items-start text-sm text-slate-600 dark:text-slate-400">
+                      <MapPin size={16} className="mr-2 mt-0.5 shrink-0 text-purple-500" />
                       <span>{lot.address || "No address provided"}</span>
                     </p>
                     
                     {/* Stats */}
-                    <div className="grid grid-cols-2 gap-4 mb-4 pb-4 border-b border-slate-100">
+                    <div className="grid grid-cols-2 gap-4 mb-4 pb-4 border-b border-slate-200 dark:border-slate-700">
                       <div>
-                        <div className="text-xs text-slate-500 mb-1">Price/Hour</div>
-                        <div className="text-lg font-bold text-slate-900">Rs. {lot.price_per_hour || 0}</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">Price/Hour</div>
+                        <div className="text-lg font-bold text-slate-900 dark:text-white">Rs. {lot.price_per_hour || 0}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-slate-500 mb-1">Occupancy</div>
-                        <div className="text-lg font-bold text-emerald-600">{lot.occupancy || 0}%</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">Occupancy</div>
+                        <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{lot.occupancy || 0}%</div>
                       </div>
                     </div>
 
@@ -543,7 +580,7 @@ export default function OwnerDashboard() {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="flex-1 text-slate-600 hover:text-purple-600 hover:border-purple-300"
+                          className="flex-1 text-purple-600 dark:text-purple-400 border-purple-300 dark:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-950/50 hover:text-purple-700 dark:hover:text-purple-300 hover:border-purple-400 dark:hover:border-purple-600 font-medium transition-all"
                           onClick={() => router.push(`/owner/edit-lot/${lot.id}`)}
                         >
                           <Edit className="mr-1 h-4 w-4" />
@@ -552,7 +589,7 @@ export default function OwnerDashboard() {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="flex-1 text-red-600 hover:text-red-700 hover:border-red-300 hover:bg-red-50"
+                          className="flex-1 text-red-600 dark:text-red-400 border-red-300 dark:border-red-700 hover:bg-red-50 dark:hover:bg-red-950/50 hover:text-red-700 dark:hover:text-red-300 hover:border-red-400 dark:hover:border-red-600 font-medium transition-all"
                           onClick={() => handleDelete(lot.id, lot.name)}
                           disabled={deletingLotId === lot.id}
                         >
@@ -565,9 +602,8 @@ export default function OwnerDashboard() {
                         </Button>
                       </div>
                       <Button 
-                        variant="outline" 
                         size="sm" 
-                        className="w-full text-indigo-600 hover:text-indigo-700 hover:border-indigo-300 hover:bg-indigo-50"
+                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 transition-all"
                         onClick={() => openOperatorModal(lot.id)}
                       >
                         <UserPlus className="mr-1 h-4 w-4" />

@@ -692,15 +692,15 @@ export default function ParkingPage() {
   };  
 
   return (
-    <div className="flex h-screen flex-col bg-slate-50 text-slate-900 overflow-hidden font-sans">
+    <div className="flex h-screen flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden font-sans">
       
       {/* --- HEADER --- */}
-      <header className="flex flex-col border-b bg-white px-8 py-5 shadow-sm z-40 md:flex-row md:items-center md:justify-between">
+      <header className="flex flex-col border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-8 py-5 shadow-sm z-40 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-indigo-900">
-            Architect Your <span className="text-indigo-600">Smart Parking Zone</span>
+          <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 dark:from-indigo-300 dark:via-purple-300 dark:to-pink-300 bg-clip-text text-transparent">
+            Architect Your Smart Parking Zone
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
             Design efficient layouts with real-world dimensions.
             {errorMsg && (
                 <span className="ml-3 inline-flex items-center gap-1 rounded bg-red-50 px-2 py-0.5 text-xs font-bold text-red-600 animate-pulse border border-red-200">
@@ -717,10 +717,10 @@ export default function ParkingPage() {
         
         <div className="mt-4 flex flex-col gap-3 md:mt-0 md:flex-row md:items-center">
             {/* Lot Name Input */}
-            <div className="flex items-center rounded-md border border-slate-300 bg-slate-50 px-3 py-2 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
-                <span className="font-medium text-slate-500 mr-2 text-xs">NAME:</span>
+            <div className="flex items-center rounded-md border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
+                <span className="font-medium text-slate-500 dark:text-slate-400 mr-2 text-xs">NAME:</span>
                 <input 
-                    className="bg-transparent text-sm outline-none w-32 text-slate-800 font-medium placeholder:font-normal" 
+                    className="bg-transparent text-sm outline-none w-32 text-slate-800 dark:text-slate-200 font-medium placeholder:font-normal placeholder:text-slate-400 dark:placeholder:text-slate-500" 
                     placeholder="e.g. City Center"
                     value={lotName}
                     onChange={e => setLotName(e.target.value)}
@@ -728,10 +728,10 @@ export default function ParkingPage() {
             </div>
 
             {/* Lot Address Input */}
-            <div className="flex items-center rounded-md border border-slate-300 bg-slate-50 px-3 py-2 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
-                <MapPin size={14} className="text-slate-500 mr-2" />
+            <div className="flex items-center rounded-md border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
+                <MapPin size={14} className="text-slate-500 dark:text-slate-400 mr-2" />
                 <input 
-                    className="bg-transparent text-sm outline-none w-48 text-slate-800" 
+                    className="bg-transparent text-sm outline-none w-48 text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500" 
                     placeholder="Full Address..."
                     value={lotAddress}
                     onChange={e => setLotAddress(e.target.value)}
@@ -739,43 +739,55 @@ export default function ParkingPage() {
             </div>
 
             {/* Base Price Input */}
-            <div className="flex items-center rounded-md border border-slate-300 bg-slate-50 px-3 py-2 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
-                <span className="font-medium text-slate-500 mr-2 text-xs">PRICE:</span>
+            <div className="flex items-center rounded-md border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
+                <span className="font-medium text-slate-500 dark:text-slate-400 mr-2 text-xs">PRICE:</span>
                 <input 
                     type="number"
                     step="10"
                     min="0"
-                    className="bg-transparent text-sm outline-none w-20 text-slate-800 font-medium" 
+                    className="bg-transparent text-sm outline-none w-20 text-slate-800 dark:text-slate-200 font-medium" 
                     placeholder="50"
                     value={basePrice}
                     onChange={e => setBasePrice(e.target.value)}
                 />
-                <span className="text-xs text-slate-500 ml-1">Rs/hr</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">Rs/hr</span>
             </div>
 
             {/* Release Buffer Input */}
-            <div className="flex items-center rounded-md border border-slate-300 bg-slate-50 px-3 py-2 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
-                <span className="font-medium text-slate-500 mr-2 text-xs">BUFFER:</span>
+            <div className="group relative flex items-center rounded-md border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
+                <span className="font-medium text-slate-500 dark:text-slate-400 mr-2 text-xs">BUFFER:</span>
                 <input 
                     type="number"
                     step="0.1"
                     min="1"
                     max="5"
-                    className="bg-transparent text-sm outline-none w-16 text-slate-800 font-medium" 
+                    className="bg-transparent text-sm outline-none w-16 text-slate-800 dark:text-slate-200 font-medium" 
                     placeholder="1.8"
                     value={releaseBuffer}
                     onChange={e => setReleaseBuffer(e.target.value)}
                 />
-                <span className="text-xs text-slate-500 ml-1">×</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">×</span>
+                <AlertCircle className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 ml-1 cursor-help" />
+                {/* Tooltip */}
+                <div className="invisible group-hover:visible absolute top-full right-0 mt-2 w-72 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-3 shadow-xl z-50 text-left">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    <span className="font-semibold text-indigo-600 dark:text-indigo-400">Buffer Time:</span> Extra waiting time for reserved spots. <br/>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">Example:</span> Travel time is 10 min + Buffer 1.8× = Spot reserved for 18 min. <br/>
+                    <span className="text-amber-600 dark:text-amber-400">⏱️</span> Auto-releases if driver doesn't arrive in time.
+                  </p>
+                  <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+                    <p className="text-[10px] text-slate-500 dark:text-slate-500 font-medium">💡 Sweet Spot: 1.5× - 2.0× (gives drivers flexibility)</p>
+                  </div>
+                </div>
             </div>
 
-            <div className="h-8 w-px bg-slate-300 mx-1 hidden md:block"></div>
+            <div className="h-8 w-px bg-slate-300 dark:bg-slate-600 mx-1 hidden md:block"></div>
 
             {/* Select Location & Publish Button */}
             <button 
                 onClick={handleOpenMapModal} 
                 disabled={isSaving}
-                className="flex items-center gap-2 rounded-md bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white shadow hover:bg-indigo-700 transition-transform active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
             >
                 {selectedLocation ? (
                   <>
@@ -795,33 +807,33 @@ export default function ParkingPage() {
       <div className="flex flex-1 overflow-hidden relative">
         
         {/* --- SIDEBAR --- */}
-        <aside className="w-72 border-r bg-white p-5 shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-30 overflow-y-auto flex flex-col gap-6">
+        <aside className="w-72 border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.3)] z-30 overflow-y-auto flex flex-col gap-6">
            
            {/* Dimensions Panel */}
-           <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
-             <h3 className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+           <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 p-4">
+             <h3 className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 <Settings size={14} /> Area Dimensions
              </h3>
              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                    <label className="text-xs font-medium text-slate-600">Width (px)</label>
+                    <label className="text-xs font-medium text-slate-600 dark:text-slate-400">Width (px)</label>
                     <input 
                         type="number" 
-                        className="w-20 rounded border border-slate-300 p-1 text-right text-sm"
+                        className="w-20 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 p-1 text-right text-sm"
                         value={Math.round(canvasSize.width)}
                         onChange={(e) => setCanvasSize(p => ({...p, width: Number(e.target.value)}))}
                     />
                 </div>
                 <div className="flex items-center justify-between">
-                    <label className="text-xs font-medium text-slate-600">Height (px)</label>
+                    <label className="text-xs font-medium text-slate-600 dark:text-slate-400">Height (px)</label>
                     <input 
                         type="number" 
-                        className="w-20 rounded border border-slate-300 p-1 text-right text-sm"
+                        className="w-20 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 p-1 text-right text-sm"
                         value={Math.round(canvasSize.height)}
                         onChange={(e) => setCanvasSize(p => ({...p, height: Number(e.target.value)}))}
                     />
                 </div>
-                <div className="text-[10px] text-slate-400 text-center mt-1">
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 text-center mt-1">
                     Min: 200x200px | 1m = 20px
                 </div>
              </div>
@@ -830,9 +842,9 @@ export default function ParkingPage() {
            {/* Add Button */}
             <button
               onClick={addSpot}
-              className="group flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-indigo-300 bg-indigo-50 py-4 font-bold text-indigo-700 transition-all hover:bg-indigo-100 hover:border-indigo-400 hover:shadow-md"
+              className="group flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-950/50 py-4 font-bold text-indigo-700 dark:text-indigo-300 transition-all hover:bg-indigo-100 dark:hover:bg-indigo-950 hover:border-indigo-400 dark:hover:border-indigo-600 hover:shadow-md"
             >
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-200 text-indigo-700 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-200 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-300 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                   <Plus size={14} strokeWidth={3} />
               </div>
               Add Parking Spot
@@ -840,14 +852,14 @@ export default function ParkingPage() {
 
           {/* Editing Panel */}
           {selectedSpotId !== null ? (
-            <div className="animate-in fade-in slide-in-from-left-4 duration-200 rounded-xl border border-indigo-100 bg-white p-4 shadow-lg ring-1 ring-indigo-50">
-              <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-indigo-600">
+            <div className="animate-in fade-in slide-in-from-left-4 duration-200 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 p-4 shadow-lg ring-1 ring-indigo-100 dark:ring-indigo-900">
+              <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                 Selected: {spots.find((s) => s.id === selectedSpotId)?.label}
               </h3>
               
-              <label className="text-[10px] font-bold text-slate-400">LABEL ID</label>
+              <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500">LABEL ID</label>
               <input 
-                className="mb-4 mt-1 w-full rounded-md border border-slate-300 bg-slate-50 p-2 text-sm focus:border-indigo-500 focus:bg-white focus:outline-none"
+                className="mb-4 mt-1 w-full rounded-md border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-2 text-sm focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none"
                 value={spots.find((s) => s.id === selectedSpotId)?.label || ''}
                 onChange={(e) => {
                     const val = e.target.value;
@@ -858,7 +870,7 @@ export default function ParkingPage() {
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => rotateSpot(selectedSpotId)}
-                  className="flex flex-col items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white py-3 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-indigo-600 active:translate-y-0.5"
+                  className="flex flex-col items-center justify-center gap-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-3 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 active:translate-y-0.5"
                 >
                   <RotateCw size={18} />
                   Rotate +45°
@@ -868,7 +880,7 @@ export default function ParkingPage() {
                       setSpots(prev => prev.filter(s => s.id !== selectedSpotId));
                       setSelectedSpotId(null);
                   }}
-                  className="flex flex-col items-center justify-center gap-1 rounded-lg border border-red-100 bg-red-50 py-3 text-xs font-semibold text-red-600 shadow-sm hover:bg-red-100 hover:border-red-200 active:translate-y-0.5"
+                  className="flex flex-col items-center justify-center gap-1 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/50 py-3 text-xs font-semibold text-red-600 dark:text-red-400 shadow-sm hover:bg-red-100 dark:hover:bg-red-950 hover:border-red-300 dark:hover:border-red-700 active:translate-y-0.5"
                 >
                   <Trash2 size={18} />
                   Delete
@@ -876,14 +888,14 @@ export default function ParkingPage() {
               </div>
             </div>
           ) : (
-             <div className="rounded-xl border border-slate-100 bg-slate-50 p-6 text-center">
-                <p className="text-sm text-slate-400">Select a car to edit details</p>
+             <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-6 text-center">
+                <p className="text-sm text-slate-400 dark:text-slate-500">Select a car to edit details</p>
              </div>
           )}
         </aside>
 
         {/* --- MAIN CANVAS --- */}
-        <main className="relative flex-1 overflow-auto bg-slate-100 p-10" 
+        <main className="relative flex-1 overflow-auto bg-slate-100 dark:bg-slate-900 p-10" 
             onClick={(e) => {
                 if (e.target === e.currentTarget) {
                     setSelectedSpotId(null);
@@ -894,7 +906,7 @@ export default function ParkingPage() {
           <div className="relative inline-block">
               <div
                 ref={canvasRef}
-                className="relative bg-white shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] ring-1 ring-slate-200 transition-all ease-out duration-75"
+                className="relative bg-white dark:bg-slate-800 shadow-[0_0_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] ring-1 ring-slate-200 dark:ring-slate-700 transition-all ease-out duration-75"
                 style={{
                     width: canvasSize.width,
                     height: canvasSize.height,
@@ -906,9 +918,9 @@ export default function ParkingPage() {
                 }}
               >
                 {/* Measurement Indicators */}
-                <div className="absolute top-0 left-0 -mt-6 text-xs font-mono text-slate-400">0m</div>
-                <div className="absolute top-0 left-full -ml-4 -mt-6 text-xs font-mono text-slate-400">{(canvasSize.width/20).toFixed(0)}m</div>
-                <div className="absolute top-full left-0 -ml-8 -mt-3 text-xs font-mono text-slate-400">{(canvasSize.height/20).toFixed(0)}m</div>
+                <div className="absolute top-0 left-0 -mt-6 text-xs font-mono text-slate-400 dark:text-slate-500">0m</div>
+                <div className="absolute top-0 left-full -ml-4 -mt-6 text-xs font-mono text-slate-400 dark:text-slate-500">{(canvasSize.width/20).toFixed(0)}m</div>
+                <div className="absolute top-full left-0 -ml-8 -mt-3 text-xs font-mono text-slate-400 dark:text-slate-500">{(canvasSize.height/20).toFixed(0)}m</div>
 
                 {/* Resize Handle */}
                 <div 
@@ -950,20 +962,20 @@ export default function ParkingPage() {
 
       {/* MAP SELECTION MODAL */}
       {showMapModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-4xl h-[600px] m-4 bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-4xl h-[600px] m-4 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
             {/* Modal Header */}
-            <div className="absolute top-0 left-0 right-0 z-10 bg-white/95 backdrop-blur-sm border-b border-slate-200 px-6 py-4">
+            <div className="absolute top-0 left-0 right-0 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700 px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <h2 className="text-xl font-bold text-slate-900">Select Parking Location</h2>
-                  <p className="text-sm text-slate-500 mt-0.5">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">Select Parking Location</h2>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
                     Search or click on the map to place your marker
                   </p>
                 </div>
                 <button
                   onClick={() => setShowMapModal(false)}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
                 >
                   <span className="text-xl">×</span>
                 </button>
@@ -972,8 +984,8 @@ export default function ParkingPage() {
               {/* Search Bar */}
               <div className="relative mt-4 search-container">
                 <div className="relative">
-                  <div className="group flex items-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-2.5 shadow-sm transition-all duration-300 hover:shadow-md focus-within:ring-2 focus-within:ring-indigo-500/30 focus-within:border-indigo-400">
-                    <svg className="h-5 w-5 shrink-0 text-slate-400 transition-colors group-focus-within:text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="group flex items-center gap-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2.5 shadow-sm transition-all duration-300 hover:shadow-md focus-within:ring-2 focus-within:ring-indigo-500/30 focus-within:border-indigo-400 dark:focus-within:border-indigo-500">
+                    <svg className="h-5 w-5 shrink-0 text-slate-400 dark:text-slate-500 transition-colors group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                     <input
@@ -981,7 +993,7 @@ export default function ParkingPage() {
                       onChange={(e) => handleSearchChange(e.target.value)}
                       onFocus={() => searchQuery.length >= 3 && setShowSearchResults(placePredictions.length > 0)}
                       placeholder="Search for a location (e.g., Bahria Town, Islamabad)..."
-                      className="w-full border-none bg-transparent text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none"
+                      className="w-full border-none bg-transparent text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none"
                     />
                     {searchQuery && (
                       <button
@@ -990,7 +1002,7 @@ export default function ParkingPage() {
                           setPlacePredictions([]);
                           setShowSearchResults(false);
                         }}
-                        className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
+                        className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-slate-600 dark:hover:text-slate-300"
                       >
                         <span className="text-xs">×</span>
                       </button>
@@ -999,21 +1011,21 @@ export default function ParkingPage() {
                   
                   {/* Search Results Dropdown */}
                   {showSearchResults && placePredictions.length > 0 && (
-                    <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-80 overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-lg">
+                    <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-80 overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg">
                       {placePredictions.map((prediction) => (
                         <button
                           key={prediction.place_id}
                           onClick={() => handleSelectSearchLocation(prediction)}
-                          className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-indigo-50 focus:bg-indigo-50 focus:outline-none"
+                          className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-indigo-50 dark:hover:bg-indigo-900/30 focus:bg-indigo-50 dark:focus:bg-indigo-900/30 focus:outline-none"
                         >
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 mt-0.5">
-                            <MapPin className="h-4 w-4 text-indigo-600" />
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 mt-0.5">
+                            <MapPin className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium text-slate-700 truncate">
+                            <div className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">
                               {prediction.structured_formatting.main_text}
                             </div>
-                            <div className="text-xs text-slate-500 truncate mt-0.5">
+                            <div className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
                               {prediction.structured_formatting.secondary_text}
                             </div>
                           </div>
@@ -1025,8 +1037,8 @@ export default function ParkingPage() {
               </div>
               
               {selectedLocation && (
-                <div className="mt-3 flex items-center gap-2 text-xs text-slate-600 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                  <MapPin size={14} className="text-emerald-600" />
+                <div className="mt-3 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700/50 rounded-lg px-3 py-2">
+                  <MapPin size={14} className="text-emerald-600 dark:text-emerald-400" />
                   <span className="font-mono">
                     Lat: {selectedLocation.lat.toFixed(6)}, Lng: {selectedLocation.lng.toFixed(6)}
                   </span>
@@ -1038,9 +1050,9 @@ export default function ParkingPage() {
             <div ref={mapContainerRef} className="w-full h-full pt-48 pb-20"></div>
 
             {/* Modal Footer */}
-            <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-slate-200 px-6 py-4">
+            <div className="absolute bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700 px-6 py-4">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   {selectedLocation 
                     ? "Location selected! Click confirm to save." 
                     : "Click anywhere on the map to select your parking location"}
@@ -1048,14 +1060,14 @@ export default function ParkingPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowMapModal(false)}
-                    className="px-4 py-2 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                    className="px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleConfirmLocation}
                     disabled={!selectedLocation || isSaving}
-                    className="px-6 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="px-6 py-2 text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
                     {isSaving ? (
                       <>
