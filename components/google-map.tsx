@@ -2,6 +2,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
 import { MapPin, Navigation2, ShieldCheck, X, Search, Car, Clock, Banknote, Crosshair, ZoomIn, ZoomOut, Bookmark } from "lucide-react";
 import clsx from "clsx";
@@ -175,6 +176,7 @@ export function SmartParkingMap({
   loadingLots,
   locationStatus,
 }: SmartParkingMapProps) {
+  const router = useRouter();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const mapRef = useRef<google.maps.Map | undefined>(undefined);
@@ -344,10 +346,9 @@ export function SmartParkingMap({
     };
   }, [initializeMap]);
 
-  // Update user location marker / map center - simple static blue dot
-  useEffect(() => {
-    if (!isMapReady || !mapRef.current || typeof window === "undefined" || !window.google || !userLocation) {
-      console.log("⏳ User marker waiting...", { isMapReady, hasMap: !!mapRef.current, hasGoogle: !!window.google, hasLocation: !!userLocation });
+  // Create and maintain user location marker - ALWAYS visible on top
+  const createUserLocationMarker = useCallback(() => {
+    if (!mapRef.current || !userLocation || typeof window === "undefined" || !window.google) {
       return;
     }
 
@@ -356,28 +357,59 @@ export function SmartParkingMap({
     // Remove old marker if exists
     if (userMarkerRef.current) {
       userMarkerRef.current.setMap(null);
+      userMarkerRef.current = null;
     }
 
-    console.log("📍 Adding user location marker at:", userLocation);
+    console.log("📍 Creating user location marker at:", userLocation);
     
-    // Create simple user location marker (blue dot with white border)
+    // Create distinctive pulsing user location marker with MAXIMUM visibility
+    const userIconSvg = `
+      <svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+        <!-- Outer glow ring -->
+        <circle cx="28" cy="28" r="24" fill="#4285F4" opacity="0.15">
+          <animate attributeName="r" values="20;26;20" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.25;0.05;0.25" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <!-- Middle pulsing ring -->
+        <circle cx="28" cy="28" r="18" fill="#4285F4" opacity="0.3">
+          <animate attributeName="r" values="16;20;16" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <!-- Outer white border -->
+        <circle cx="28" cy="28" r="12" fill="#ffffff" stroke="#4285F4" stroke-width="3"/>
+        <!-- Inner blue circle -->
+        <circle cx="28" cy="28" r="8" fill="#4285F4"/>
+        <!-- Center white dot -->
+        <circle cx="28" cy="28" r="3" fill="#ffffff"/>
+      </svg>
+    `;
+    
+    // Create marker with MAXIMUM z-index and visibility settings
     userMarkerRef.current = new google.maps.Marker({
       position: userLocation,
       map,
-      zIndex: 1000,
+      zIndex: 999999, // MAXIMUM z-index to ensure always on top
       icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 10,
-        fillColor: "#4285F4", // Google blue
-        fillOpacity: 1,
-        strokeColor: "#ffffff",
-        strokeWeight: 3,
+        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(userIconSvg),
+        scaledSize: new google.maps.Size(56, 56), // Larger size for better visibility
+        anchor: new google.maps.Point(28, 28),
       },
-      title: "Your location",
+      title: "📍 Your Current Location",
+      optimized: false, // CRITICAL: Disable optimization for SVG animation
+      clickable: false, // Prevent marker from intercepting clicks
     });
 
-    map.panTo(userLocation);
-    console.log("✅ User location marker added");
+    console.log("✅ User location marker created with maximum visibility");
+  }, [userLocation]);
+
+  // Update user location marker when location or map changes
+  useEffect(() => {
+    if (!isMapReady || !mapRef.current || !userLocation) {
+      console.log("⏳ User marker waiting...", { isMapReady, hasMap: !!mapRef.current, hasLocation: !!userLocation });
+      return;
+    }
+
+    createUserLocationMarker();
+    mapRef.current.panTo(userLocation);
 
     return () => {
       if (userMarkerRef.current) {
@@ -385,7 +417,7 @@ export function SmartParkingMap({
         userMarkerRef.current = null;
       }
     };
-  }, [userLocation, isMapReady]);
+  }, [userLocation, isMapReady, createUserLocationMarker]);
 
   // Google Places Autocomplete search handler
   const handleSearchChange = useCallback((query: string) => {
@@ -652,7 +684,15 @@ export function SmartParkingMap({
     });
 
     console.log("✅ Added", markersRef.current.length, "parking markers with clustering");
-  }, [parkingLots, predictionLookup, requestTravelEstimate]);
+    
+    // CRITICAL: Recreate user location marker AFTER parking markers to ensure it's on top
+    if (userLocation && isMapReady) {
+      setTimeout(() => {
+        createUserLocationMarker();
+        console.log("🔄 User marker recreated after parking markers");
+      }, 100);
+    }
+  }, [parkingLots, predictionLookup, requestTravelEstimate, userLocation, isMapReady, createUserLocationMarker]);
 
   useEffect(() => {
     if (!isMapReady || parkingLots.length === 0) {
@@ -903,10 +943,13 @@ export function SmartParkingMap({
         </div>
       )}
 
-      {/* Active bookings badge - floating pill */}
+      {/* Active bookings badge - floating pill - clickable */}
       {preBookings.length > 0 && (
         <div className="pointer-events-auto absolute left-4 top-20 z-10 sm:left-6 sm:top-18">
-          <div className="flex items-center gap-2.5 rounded-full border border-indigo-200 bg-indigo-50/95 px-4 py-2.5 shadow-lg backdrop-blur-sm">
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="flex items-center gap-2.5 rounded-full border border-indigo-200 bg-indigo-50/95 px-4 py-2.5 shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-indigo-100/95 hover:border-indigo-300 hover:shadow-xl active:scale-95 cursor-pointer"
+          >
             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
               {preBookings.length}
             </div>
@@ -914,7 +957,7 @@ export function SmartParkingMap({
               Active {preBookings.length > 1 ? 'Bookings' : 'Booking'}
             </span>
             <Bookmark className="h-4 w-4 text-indigo-500" />
-          </div>
+          </button>
         </div>
       )}
 
