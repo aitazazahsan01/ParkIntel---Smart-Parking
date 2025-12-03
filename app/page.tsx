@@ -155,55 +155,55 @@ export default function WelcomePage() {
           </div>
         </div>
 
-        {/* 3. ENHANCED STATS SECTION */}
+        {/* 3. ENHANCED FEATURES SECTION */}
         <div className="w-full max-w-6xl">
           <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl border-2 border-slate-200/50 dark:border-slate-800/50 p-10 shadow-2xl">
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 dark:border-indigo-500/30 mb-4">
                 <Sparkles className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">Powered by AI</span>
+                <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">Why Choose ParkIntel?</span>
               </div>
-              <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Real-Time Intelligence</h3>
+              <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Smart Parking Made Simple</h3>
               <p className="text-slate-600 dark:text-slate-400 text-base max-w-2xl mx-auto">
-                Our ML models process thousands of data points hourly to optimize your parking experience.
+                Experience hassle-free parking with instant availability, live tracking, and real-time updates.
               </p>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-              {/* Stat 1 */}
+              {/* Feature 1 */}
               <div className="text-center group hover:scale-110 transition-transform duration-300">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 mx-auto mb-4 flex items-center justify-center shadow-lg shadow-emerald-500/30">
                   <Zap className="h-8 w-8 text-white" />
                 </div>
-                <div className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 dark:from-emerald-400 dark:to-emerald-500 bg-clip-text text-transparent mb-2">98%</div>
-                <div className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-500 font-semibold">Prediction Accuracy</div>
+                <div className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 dark:from-emerald-400 dark:to-emerald-500 bg-clip-text text-transparent mb-2">Instant</div>
+                <div className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-500 font-semibold">Spot Booking</div>
               </div>
               
-              {/* Stat 2 */}
+              {/* Feature 2 */}
               <div className="text-center group hover:scale-110 transition-transform duration-300">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 mx-auto mb-4 flex items-center justify-center shadow-lg shadow-indigo-500/30">
                   <Activity className="h-8 w-8 text-white" />
                 </div>
-                <div className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 bg-clip-text text-transparent mb-2">15k+</div>
-                <div className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-500 font-semibold">Daily Predictions</div>
+                <div className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 bg-clip-text text-transparent mb-2">Live</div>
+                <div className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-500 font-semibold">Availability Status</div>
               </div>
               
-              {/* Stat 3 */}
+              {/* Feature 3 */}
               <div className="text-center group hover:scale-110 transition-transform duration-300">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 mx-auto mb-4 flex items-center justify-center shadow-lg shadow-purple-500/30">
                   <Car className="h-8 w-8 text-white" />
                 </div>
                 <div className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-purple-700 dark:from-purple-400 dark:to-purple-500 bg-clip-text text-transparent mb-2">24/7</div>
-                <div className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-500 font-semibold">Real-time Monitoring</div>
+                <div className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-500 font-semibold">Access & Support</div>
               </div>
               
-              {/* Stat 4 */}
+              {/* Feature 4 */}
               <div className="text-center group hover:scale-110 transition-transform duration-300">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 mx-auto mb-4 flex items-center justify-center shadow-lg shadow-pink-500/30">
                   <Sparkles className="h-8 w-8 text-white" />
                 </div>
-                <div className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-pink-700 dark:from-pink-400 dark:to-pink-500 bg-clip-text text-transparent mb-2">0.5s</div>
-                <div className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-500 font-semibold">API Latency</div>
+                <div className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-pink-700 dark:from-pink-400 dark:to-pink-500 bg-clip-text text-transparent mb-2">&lt;1s</div>
+                <div className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-500 font-semibold">Response Time</div>
               </div>
             </div>
           </div>

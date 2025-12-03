@@ -419,7 +419,16 @@ export default function OperatorDashboard() {
     const now = new Date();
     const durationMs = now.getTime() - checkIn.getTime();
     const durationHours = durationMs / (1000 * 60 * 60);
-    const pricePerHour = selectedLot.price_per_hour || selectedLot.base_price || 50;
+    
+    // Calculate dynamic price based on current availability
+    const basePrice = selectedLot.price_per_hour || selectedLot.base_price || 50;
+    const totalSpots = spots.length || 1;
+    const occupiedSpots = spots.filter(s => s.is_occupied).length;
+    const availableSpots = totalSpots - occupiedSpots;
+    const availability = availableSpots / totalSpots;
+    
+    // Dynamic pricing: Higher availability = Lower price, Lower availability = Higher price
+    const pricePerHour = Math.max(50, Math.round(basePrice * (1 + (0.6 - availability) * 0.35)));
     
     // Round UP to next full hour (ceiling) - minimum 1 hour
     const hoursToCharge = Math.max(1, Math.ceil(durationHours));

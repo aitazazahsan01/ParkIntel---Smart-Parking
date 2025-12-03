@@ -250,11 +250,16 @@ export function SmartParkingMap({
         const availableSpots = lot.available_spots || 0;
         const probability = availableSpots / totalSpots;
         
+        // Dynamic pricing: Higher availability = Lower price, Lower availability = Higher price
+        // Formula: base_price × (1 + (0.6 - probability) × 0.35)
+        // At 60% availability = base price, >60% = discount, <60% = premium
+        const dynamicPrice = Math.max(50, Math.round(lot.base_price * (1 + (0.6 - probability) * 0.35)));
+        
         return {
           lotId: lot.id,
           probability,
           confidenceLabel: "Real-Time",
-          dynamicPrice: lot.base_price, // Use base price for real-time data
+          dynamicPrice: dynamicPrice,
           source: 'real-time' as const,
           lastUpdated: new Date(),
         } satisfies LotPrediction;
