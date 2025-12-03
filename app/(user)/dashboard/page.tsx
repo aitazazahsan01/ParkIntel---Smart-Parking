@@ -39,6 +39,7 @@ export default function DriverDashboard() {
   const [filter, setFilter] = useState<"all" | "active" | "completed">("all");
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [reservationToCancel, setReservationToCancel] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -81,6 +82,9 @@ export default function DriverDashboard() {
         return;
       }
 
+      // Store user ID in state for subscriptions
+      setUserId(userData.user.id);
+
       // Check user role - redirect if not a driver
       const { data: profile } = await supabase
         .from("profiles")
@@ -96,15 +100,54 @@ export default function DriverDashboard() {
         return;
       }
 
-      // Fetch parking sessions
-      const { data, error } = await supabase
+      // Fetch parking sessions with lot information
+      const { data: sessionsData, error: sessionsError } = await supabase
         .from("parking_sessions")
-        .select("*")
+        .select(`
+          id,
+          lot_id,
+          spot_id,
+          plate_number,
+          check_in_time,
+          check_out_time,
+          fee_charged,
+          status,
+          created_at,
+          ParkingLots:lot_id (
+            name,
+            address
+          )
+        `)
         .eq("user_id", userData.user.id)
         .order("check_in_time", { ascending: false });
 
-      if (data) {
-        setSessions(data);
+      if (sessionsError) {
+        console.error("❌ Error fetching sessions:", sessionsError);
+      }
+
+      if (sessionsData) {
+        // Format sessions with lot information
+        const formattedSessions = sessionsData.map((session: any) => {
+          const checkInTime = new Date(session.check_in_time);
+          const checkOutTime = session.check_out_time ? new Date(session.check_out_time) : null;
+          const durationMinutes = checkOutTime 
+            ? Math.round((checkOutTime.getTime() - checkInTime.getTime()) / 60000)
+            : null;
+
+          return {
+            id: session.id.toString(),
+            location_name: session.ParkingLots?.name || "Unknown Location",
+            address: session.ParkingLots?.address || "N/A",
+            check_in_time: session.check_in_time,
+            check_out_time: session.check_out_time,
+            duration_minutes: durationMinutes,
+            amount_paid: session.fee_charged,
+            status: session.status,
+          };
+        });
+
+        console.log("✅ Fetched", formattedSessions.length, "parking sessions");
+        setSessions(formattedSessions);
       }
 
       // Fetch active reservations
@@ -142,7 +185,54 @@ export default function DriverDashboard() {
     };
 
     fetchSessions();
-  }, [router]);
+
+    // Set up real-time subscriptions only after userId is available
+    if (!userId) return;
+
+    // Set up real-time subscription for parking sessions
+    const sessionsChannel = supabase
+      .channel('driver-sessions-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'parking_sessions',
+          filter: `user_id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('🔄 Real-time session update:', payload);
+          // Refetch sessions when changes occur
+          fetchSessions();
+        }
+      )
+      .subscribe();
+
+    // Set up real-time subscription for pre-bookings
+    const bookingsChannel = supabase
+      .channel('driver-bookings-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'pre_bookings',
+          filter: `user_id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('🔄 Real-time booking update:', payload);
+          // Refetch reservations when changes occur
+          fetchSessions();
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscriptions on unmount
+    return () => {
+      supabase.removeChannel(sessionsChannel);
+      supabase.removeChannel(bookingsChannel);
+    };
+  }, [router, userId]);
 
   const filteredSessions = sessions.filter((session) => {
     if (filter === "active") return session.status === "active";
