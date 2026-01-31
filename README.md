@@ -89,9 +89,9 @@ This project was collaboratively built by students of the Software Engineering D
 
 | Name | Role | GitHub |
 | :--- | :--- | :--- |
-| **Aaitazaz Ahsan** | Full Stack Developer | [@AaitazazAhsan](https://github.com/AaitazazAhsan) |
+| **M Aitazaz Ahsan** | Full Stack Developer | [@AaitazazAhsan](https://github.com/aitazazahsan01) |
 | **Ehtisham Ahmed** | Full Stack Developer | [@EhtishamAh](https://github.com/EhtishamAh) |
-| **Saad Safi** | Full Stack Developer | [@SaadSafi](https://github.com/SaadSafi) |
+| **Saad Safi** | Full Stack Developer | [@SaadSafi](https://github.com/saadsafi123) |
 
 ---
 
